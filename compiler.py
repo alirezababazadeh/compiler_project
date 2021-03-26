@@ -181,8 +181,8 @@ def write_tokens():
         for key, values in tokens.items():
             values_string = ""
             for value in values:
-                values_string += str(value) + " "
-            tokens_file += f"{key}.    {values_string.strip()}\n"
+                values_string += f"({value[0]}, {value[1]}) "
+            tokens_file += f"{key}.\t{values_string.strip()}\n"
     open('tokens.txt', 'w').write(tokens_file)
 
 
@@ -194,13 +194,13 @@ def write_lexical_errors():
         for key, values in lexical_errors.items():
             values_string = ""
             for value in values:
-                values_string += str(value) + " "
-            lexical_file += f"{key}.    {values_string.strip()}\n"
+                values_string += f"({value[0]}, {value[1]}) "
+            lexical_file += f"{key}.\t{values_string.strip()}\n"
     open('lexical_errors.txt', 'w').write(lexical_file)
 
 
 def write_symbol_table():
-    symbol_table_file = "".join(f"{value.index}.    {value.name}\n" for value in symbol_table)
+    symbol_table_file = "".join(f"{value.index}.\t{value.name}\n" for value in symbol_table)
     open('symbol_table.txt', 'w').write(symbol_table_file)
 
 
