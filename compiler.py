@@ -3,7 +3,7 @@ from symbol import *
 
 create_basic_symbol_table()
 
-path = 'input.txt'
+path = 'PA1_sample_programs\\T05\\input.txt'
 text = open(path).read()
 pointer = 0
 line_no = 1
@@ -105,7 +105,7 @@ class Tokenizer:
                     break
             # check comment is an unclosed comment
             if pointer == len(text) and text[pointer - 2] != '*' and text[pointer - 1] != '/':
-                add_lexical_error((f"/*{text[started_point: started_point + 4]}...", 'Unclosed comment'))
+                add_lexical_error((f"/*{text[started_point: started_point + 5]}...", 'Unclosed comment'))
         # none of // or /*, so it is lexical error
         else:
             add_lexical_error((text[pointer], 'Invalid input'))
