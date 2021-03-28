@@ -1,4 +1,3 @@
-import re
 from symbol import *
 
 create_basic_symbol_table()
@@ -25,7 +24,7 @@ class Tokenizer:
             else:
                 break
         # check token is a identifier or keyword or lexical error
-        if re.match('\\|/|\s|;|:|,|\[|\]|\(|\)|{|\}|\+|-|\*|=|<', text[pointer]):
+        if check_regex(' \n\r\f\v/;:,[](){}+-*=<', text[pointer]):
             lexeme = find_lexeme_or_add(text[started_point:pointer])
             add_token(lexeme)
             return lexeme
@@ -45,8 +44,8 @@ class Tokenizer:
             else:
                 break
         # check token is a number or lexical error
-        if re.match('\\|/|\s|;|:|,|\[|\]|\(|\)|{|\}|\+|-|\*|=|<', text[pointer]):
-            number = 'NUMBER', text[started_point:pointer]
+        if check_regex(' \n\r\f\v/;:,[](){}+-*=<', text[pointer]):
+            number = 'NUM', text[started_point:pointer]
             add_token(number)
             return number
         else:
@@ -138,6 +137,13 @@ def add_token(token):
             tokens[str(line_no)] = [token]
 
 
+def check_regex(regex: str, character):
+    for char in regex:
+        if character == char:
+            return True
+    return False
+
+
 def get_next_token():
     global pointer
     global line_no
@@ -154,19 +160,19 @@ def get_next_token():
             if output:
                 return output
         # SYMBOL
-        elif re.match('[;:,\[\](){}+\-*=<]', text[pointer]):
+        elif check_regex(';:,[](){}+-*=<', text[pointer]):
             output = Tokenizer.tokenize_symbol()
             if output:
                 return output
         # COMMENT
-        elif re.match('/', text[pointer]):
+        elif text[pointer] == '/':
             Tokenizer.ignore_comment()
         # END OF LINE
         elif text[pointer] == '\n':
             pointer += 1
             line_no += 1
         # WHITESPACE
-        elif re.match('[\s\t\f\r]', text[pointer]):
+        elif check_regex(' \t\f\r\v', text[pointer]):
             pointer += 1
         else:
             add_lexical_error((text[pointer], 'Invalid input'))
