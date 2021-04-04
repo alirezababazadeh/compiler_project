@@ -55,7 +55,7 @@ class Tokenizer:
             else:
                 break
         # check token is a identifier or keyword or lexical error
-        if not self.buffer.has_next() or is_not_alpha_or_num(self.buffer.current_char()):
+        if not self.buffer.has_next() or is_valid_input(self.buffer.current_char()):
             lexeme = self.find_lexeme_or_add(self.buffer.get_text(started_point, self.buffer.pointer))
             self.token_repository.add_token(lexeme, self.buffer.line_number)
             return lexeme
@@ -73,7 +73,7 @@ class Tokenizer:
             else:
                 break
         # check token is a number or lexical error
-        if not self.buffer.has_next() or is_not_alpha_or_num(self.buffer.current_char()):
+        if not self.buffer.has_next() or is_valid_input(self.buffer.current_char()):
             number = 'NUM', self.buffer.get_text(started_point, self.buffer.pointer)
             self.token_repository.add_token(number, self.buffer.line_number)
             return number
@@ -92,6 +92,11 @@ class Tokenizer:
                 self.buffer.push_forward(2)
                 self.token_repository.add_token(symbol, self.buffer.line_number)
                 return symbol
+            elif self.buffer.has_next(1) and not is_valid_input(self.buffer.get_char_at(self.buffer.pointer + 1)):
+                self.buffer.push_forward(2)
+                self.error_handler.add_lexical_error(
+                    (self.buffer.get_text(self.buffer.pointer - 2, self.buffer.pointer), 'Invalid input'),
+                    self.buffer.line_number)
             else:
                 symbol = 'SYMBOL', current_char
                 self.buffer.push_forward()
@@ -156,7 +161,7 @@ class Tokenizer:
             return 'KEYWORD', name
 
 
-def is_not_alpha_or_num(char):
+def is_valid_input(char):
     if char in SYMBOLS or char in SPACES or char in COMMENTS:
         return True
     return False
