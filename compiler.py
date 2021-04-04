@@ -107,6 +107,12 @@ class Tokenizer:
                 self.buffer.pointer + 1) == '/':
             self.buffer.push_forward(2)
             self.error_handler.add_lexical_error(('*/', 'Unmatched comment'), self.buffer.line_number)
+        elif current_char == '*' and self.buffer.has_next(1) and not is_valid_input(
+                self.buffer.get_char_at(self.buffer.pointer + 1)):
+            self.buffer.push_forward(2)
+            self.error_handler.add_lexical_error(
+                (self.buffer.get_text(self.buffer.pointer - 2, self.buffer.pointer), 'Invalid input'),
+                self.buffer.line_number)
         else:
             symbol = 'SYMBOL', current_char
             self.buffer.push_forward()
