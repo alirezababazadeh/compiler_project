@@ -154,6 +154,13 @@ class Tokenizer:
             else:
                 self.buffer.increase_line_number(to_be_increase_line)
         # none of // or /*, so it is lexical error
+        elif self.buffer.has_next(1) and not is_valid_input(
+                self.buffer.get_char_at(self.buffer.pointer + 1)) and not str.isalpha(
+            self.buffer.get_char_at(self.buffer.pointer + 1)):
+            self.buffer.push_forward(2)
+            self.error_handler.add_lexical_error(
+                (self.buffer.get_text(self.buffer.pointer - 2, self.buffer.pointer), 'Invalid input'),
+                self.buffer.line_number)
         else:
             self.error_handler.add_lexical_error((self.buffer.current_char(), 'Invalid input'),
                                                  self.buffer.line_number)
