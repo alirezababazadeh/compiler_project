@@ -2,7 +2,7 @@ from symbol import *
 
 create_basic_symbol_table()
 
-path = 'input.txt'
+path = 'PA1_sample_programs\\T10\\input.txt'
 text = open(path).read()
 pointer = 0
 line_no = 1
@@ -24,7 +24,7 @@ class Tokenizer:
             else:
                 break
         # check token is a identifier or keyword or lexical error
-        if check_regex(' \n\r\f\v\t\n/;:,[](){}+-*=<', text[pointer]):
+        if len(text) <= pointer or check_regex(' \n\r\f\v\t\n/;:,[](){}+-*=<', text[pointer]):
             lexeme = find_lexeme_or_add(text[started_point:pointer])
             add_token(lexeme)
             return lexeme
@@ -44,7 +44,7 @@ class Tokenizer:
             else:
                 break
         # check token is a number or lexical error
-        if check_regex(' \n\r\f\v\t\n/;:,[](){}+-*=<', text[pointer]):
+        if len(text) <= pointer or check_regex(' \n\r\f\v\t\n/;:,[](){}+-*=<', text[pointer]):
             number = 'NUM', text[started_point:pointer]
             add_token(number)
             return number
@@ -59,7 +59,7 @@ class Tokenizer:
         global text
         # check symbol is == or =
         if text[pointer] == '=':
-            if text[pointer + 1] == '=':
+            if len(text) > pointer and text[pointer + 1] == '=':
                 symbol = 'SYMBOL', text[pointer: pointer + 2]
                 pointer += 2
                 add_token(symbol)
@@ -70,7 +70,7 @@ class Tokenizer:
                 add_token(symbol)
                 return symbol
         # check symbol is an */ (unmatched comment) or *
-        elif text[pointer] == '*' and text[pointer + 1] == '/':
+        elif text[pointer] == '*' and len(text) > pointer + 1 and text[pointer + 1] == '/':
             pointer += 2
             add_lexical_error(('*/', 'Unmatched comment'))
         else:
@@ -85,7 +85,7 @@ class Tokenizer:
         global line_no
         global text
         # check comment is //
-        if text[pointer + 1] == '/':
+        if len(text) > pointer + 1 and text[pointer + 1] == '/':
             pointer += 2
             started_point = pointer
             for char in text[started_point:]:
@@ -94,7 +94,7 @@ class Tokenizer:
                     line_no += 1
                     break
         # check comment is /*
-        elif text[pointer + 1] == '*':
+        elif len(text) > pointer + 1 and text[pointer + 1] == '*':
             pointer += 2
             started_point = pointer
             for char in text[started_point:]:
