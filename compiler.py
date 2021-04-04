@@ -207,6 +207,8 @@ def write_lexical_errors():
 
 def write_symbol_table():
     symbol_table_file = "".join(f"{value.index}.\t{value.name}\n" for value in symbol_table)
+    if len(symbol_table_file) > 0:
+        symbol_table_file = symbol_table_file[:-1]
     open('symbol_table.txt', 'w').write(symbol_table_file)
 
 
