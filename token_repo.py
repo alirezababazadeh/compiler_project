@@ -19,4 +19,6 @@ class TokenRepository:
             for value in values:
                 values_string += f"({value[0]}, {value[1]}) "
             output += f"{key}.\t{values_string.strip()}\n"
+        if len(output) > 0:
+            output = output[:-1]
         return output

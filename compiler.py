@@ -173,7 +173,7 @@ def write_symbol_table(symbol_table):
 
 
 def main():
-    path = 'PA1_sample_programs\\T02\\input.txt'
+    path = 'PA1_sample_programs\\T10\\input.txt'
     program_text = open(path).read()
 
     buffer = Buffer(program_text)
