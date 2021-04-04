@@ -122,8 +122,11 @@ class Tokenizer:
         elif self.buffer.has_next(1) and self.buffer.get_char_at(self.buffer.pointer + 1) == '*':
             self.buffer.push_forward(2)
             started_point = self.buffer.pointer
+            to_be_increase_line = 0
             for char in self.buffer.text[started_point:]:
                 self.buffer.push_forward()
+                if char == '\n':
+                    to_be_increase_line += 1
                 if char == '*' and self.buffer.current_char() == '/':
                     self.buffer.push_forward()
                     break
@@ -137,6 +140,8 @@ class Tokenizer:
                 self.error_handler.add_lexical_error(
                     (error_text, 'Unclosed comment'),
                     self.buffer.line_number)
+            else:
+                self.buffer.increase_line_number(to_be_increase_line)
         # none of // or /*, so it is lexical error
         else:
             self.error_handler.add_lexical_error((self.buffer.current_char(), 'Invalid input'),

@@ -13,8 +13,8 @@ class Buffer:
     def push_forward(self, length=1):
         self.pointer += length
 
-    def increase_line_number(self):
-        self.line_number += 1
+    def increase_line_number(self, count=1):
+        self.line_number += count
 
     def get_text(self, start, end):
         return self.text[start:end]
