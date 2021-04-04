@@ -24,7 +24,7 @@ class Tokenizer:
             else:
                 break
         # check token is a identifier or keyword or lexical error
-        if check_regex(' \n\r\f\v/;:,[](){}+-*=<', text[pointer]):
+        if check_regex(' \n\r\f\v\t\n/;:,[](){}+-*=<', text[pointer]):
             lexeme = find_lexeme_or_add(text[started_point:pointer])
             add_token(lexeme)
             return lexeme
@@ -44,7 +44,7 @@ class Tokenizer:
             else:
                 break
         # check token is a number or lexical error
-        if check_regex(' \n\r\f\v/;:,[](){}+-*=<', text[pointer]):
+        if check_regex(' \n\r\f\v\t\n/;:,[](){}+-*=<', text[pointer]):
             number = 'NUM', text[started_point:pointer]
             add_token(number)
             return number
@@ -104,7 +104,7 @@ class Tokenizer:
                     break
             # check comment is an unclosed comment
             if pointer == len(text) and text[pointer - 2] != '*' and text[pointer - 1] != '/':
-                add_lexical_error((f"/*{text[started_point: started_point + 4]}...", 'Unclosed comment'))
+                add_lexical_error((f"/*{text[started_point: started_point + 5]}...", 'Unclosed comment'))
         # none of // or /*, so it is lexical error
         else:
             add_lexical_error((text[pointer], 'Invalid input'))
