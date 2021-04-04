@@ -2,7 +2,7 @@ from symbol import *
 
 create_basic_symbol_table()
 
-path = 'PA1_sample_programs\\T10\\input.txt'
+path = 'input.txt'
 text = open(path).read()
 pointer = 0
 line_no = 1
