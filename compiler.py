@@ -1,4 +1,3 @@
-import re
 from symbol import *
 
 create_basic_symbol_table()
@@ -25,7 +24,7 @@ class Tokenizer:
             else:
                 break
         # check token is a identifier or keyword or lexical error
-        if re.match('\\|/|\s|;|:|,|\[|\]|\(|\)|{|\}|\+|-|\*|=|<', text[pointer]):
+        if len(text) <= pointer or check_regex(' \n\r\f\v\t\n/;:,[](){}+-*=<', text[pointer]):
             lexeme = find_lexeme_or_add(text[started_point:pointer])
             add_token(lexeme)
             return lexeme
@@ -45,8 +44,8 @@ class Tokenizer:
             else:
                 break
         # check token is a number or lexical error
-        if re.match('\\|/|\s|;|:|,|\[|\]|\(|\)|{|\}|\+|-|\*|=|<', text[pointer]):
-            number = 'NUMBER', text[started_point:pointer]
+        if len(text) <= pointer or check_regex(' \n\r\f\v\t\n/;:,[](){}+-*=<', text[pointer]):
+            number = 'NUM', text[started_point:pointer]
             add_token(number)
             return number
         else:
@@ -60,7 +59,7 @@ class Tokenizer:
         global text
         # check symbol is == or =
         if text[pointer] == '=':
-            if text[pointer + 1] == '=':
+            if len(text) > pointer and text[pointer + 1] == '=':
                 symbol = 'SYMBOL', text[pointer: pointer + 2]
                 pointer += 2
                 add_token(symbol)
@@ -71,7 +70,7 @@ class Tokenizer:
                 add_token(symbol)
                 return symbol
         # check symbol is an */ (unmatched comment) or *
-        elif text[pointer] == '*' and text[pointer + 1] == '/':
+        elif text[pointer] == '*' and len(text) > pointer + 1 and text[pointer + 1] == '/':
             pointer += 2
             add_lexical_error(('*/', 'Unmatched comment'))
         else:
@@ -86,7 +85,7 @@ class Tokenizer:
         global line_no
         global text
         # check comment is //
-        if text[pointer + 1] == '/':
+        if len(text) > pointer + 1 and text[pointer + 1] == '/':
             pointer += 2
             started_point = pointer
             for char in text[started_point:]:
@@ -95,7 +94,7 @@ class Tokenizer:
                     line_no += 1
                     break
         # check comment is /*
-        elif text[pointer + 1] == '*':
+        elif len(text) > pointer + 1 and text[pointer + 1] == '*':
             pointer += 2
             started_point = pointer
             for char in text[started_point:]:
@@ -138,6 +137,13 @@ def add_token(token):
             tokens[str(line_no)] = [token]
 
 
+def check_regex(regex: str, character):
+    for char in regex:
+        if character == char:
+            return True
+    return False
+
+
 def get_next_token():
     global pointer
     global line_no
@@ -154,19 +160,19 @@ def get_next_token():
             if output:
                 return output
         # SYMBOL
-        elif re.match('[;:,\[\](){}+\-*=<]', text[pointer]):
+        elif check_regex(';:,[](){}+-*=<', text[pointer]):
             output = Tokenizer.tokenize_symbol()
             if output:
                 return output
         # COMMENT
-        elif re.match('/', text[pointer]):
+        elif text[pointer] == '/':
             Tokenizer.ignore_comment()
         # END OF LINE
         elif text[pointer] == '\n':
             pointer += 1
             line_no += 1
         # WHITESPACE
-        elif re.match('[\s\t\f\r]', text[pointer]):
+        elif check_regex(' \t\f\r\v', text[pointer]):
             pointer += 1
         else:
             add_lexical_error((text[pointer], 'Invalid input'))
@@ -201,6 +207,8 @@ def write_lexical_errors():
 
 def write_symbol_table():
     symbol_table_file = "".join(f"{value.index}.\t{value.name}\n" for value in symbol_table)
+    if len(symbol_table_file) > 0:
+        symbol_table_file = symbol_table_file[:-1]
     open('symbol_table.txt', 'w').write(symbol_table_file)
 
 
