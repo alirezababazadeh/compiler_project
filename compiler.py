@@ -4,6 +4,9 @@ from symbol_table import SymbolTable
 from consts import *
 from token_repo import TokenRepository
 
+output_path = ''
+input_path = 'input.txt'
+
 
 class Tokenizer:
     def __init__(self, program_buffer, token_repository, error_handler, symbol_table):
@@ -156,7 +159,7 @@ def write_tokens(token_repository):
         tokens_file = str(token_repository)
     else:
         tokens_file = "There is no token."
-    open('out\\tokens.txt', 'w').write(tokens_file)
+    open(output_path + 'tokens.txt', 'w').write(tokens_file)
 
 
 def write_lexical_errors(error_handler):
@@ -165,16 +168,15 @@ def write_lexical_errors(error_handler):
     else:
         lexical_file = "There is no lexical error."
 
-    open('out\\lexical_errors.txt', 'w').write(lexical_file)
+    open(output_path + 'lexical_errors.txt', 'w').write(lexical_file)
 
 
 def write_symbol_table(symbol_table):
-    open('out\\symbol_table.txt', 'w').write(str(symbol_table))
+    open(output_path + 'symbol_table.txt', 'w').write(str(symbol_table))
 
 
 def main():
-    path = 'PA1_sample_programs\\T10\\input.txt'
-    program_text = open(path).read()
+    program_text = open(input_path).read()
 
     buffer = Buffer(program_text)
     symbol_table = SymbolTable(KEYWORDS)

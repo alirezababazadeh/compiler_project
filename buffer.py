@@ -16,9 +16,6 @@ class Buffer:
     def increase_line_number(self):
         self.line_number += 1
 
-    def decrease_line_number(self):
-        self.line_number -= 1
-
     def get_text(self, start, end):
         return self.text[start:end]
 
