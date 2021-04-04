@@ -85,7 +85,7 @@ class Tokenizer:
         current_char = self.buffer.current_char()
         if current_char == '=':
             if self.buffer.has_next(1) and self.buffer.get_char_at(self.buffer.pointer + 1) == '=':
-                symbol = 'SYMBOL', self.buffer.text[self.buffer.pointer, self.buffer.pointer + 2]
+                symbol = 'SYMBOL', self.buffer.text[self.buffer.pointer:self.buffer.pointer + 2]
                 self.buffer.push_forward(2)
                 self.token_repository.add_token(symbol, self.buffer.line_number)
                 return symbol
@@ -173,7 +173,7 @@ def write_symbol_table(symbol_table):
 
 
 def main():
-    path = 'PA1_sample_programs\\T10\\input.txt'
+    path = 'PA1_sample_programs\\T02\\input.txt'
     program_text = open(path).read()
 
     buffer = Buffer(program_text)
