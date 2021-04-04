@@ -7,14 +7,11 @@ class Buffer:
     def has_next(self):
         return self.pointer < len(self.text)
 
-    def get_current_char(self):
+    def current_char(self):
         return self.text[self.pointer]
 
     def push_forward(self, length=1):
         self.pointer += length
-
-    def take_back(self, length=1):
-        self.pointer -= length
 
     def increase_line_number(self):
         self.line_number += 1
