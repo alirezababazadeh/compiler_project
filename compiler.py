@@ -55,7 +55,7 @@ class Tokenizer:
             else:
                 break
         # check token is a identifier or keyword or lexical error
-        if self.buffer.has_next() and is_not_alpha_or_num(self.buffer.current_char()):
+        if not self.buffer.has_next() or is_not_alpha_or_num(self.buffer.current_char()):
             lexeme = self.find_lexeme_or_add(self.buffer.get_text(started_point, self.buffer.pointer))
             self.token_repository.add_token(lexeme, self.buffer.line_number)
             return lexeme
@@ -73,7 +73,7 @@ class Tokenizer:
             else:
                 break
         # check token is a number or lexical error
-        if self.buffer.has_next() and is_not_alpha_or_num(self.buffer.current_char()):
+        if not self.buffer.has_next() or is_not_alpha_or_num(self.buffer.current_char()):
             number = 'NUM', self.buffer.get_text(started_point, self.buffer.pointer)
             self.token_repository.add_token(number, self.buffer.line_number)
             return number
@@ -130,9 +130,12 @@ class Tokenizer:
             # check comment is an unclosed comment
             text = self.buffer.text
             pointer = self.buffer.pointer
-            if pointer == len(text) and text[pointer - 2] != '*' and text[pointer - 1] != '/':
+            if pointer == len(text) and (text[pointer - 2] != '*' or text[pointer - 1] != '/'):
+                error_text = f"/*{text[started_point: started_point + 5]}"
+                if pointer > started_point + 5:
+                    error_text += "..."
                 self.error_handler.add_lexical_error(
-                    (f"/*{text[started_point: started_point + 5]}...", 'Unclosed comment'),
+                    (error_text, 'Unclosed comment'),
                     self.buffer.line_number)
         # none of // or /*, so it is lexical error
         else:
