@@ -52,8 +52,7 @@ class Tokenizer:
             else:
                 break
         # check token is a identifier or keyword or lexical error
-        current_char = self.buffer.current_char()
-        if current_char in SYMBOLS or current_char in SPACES or current_char in COMMENTS:
+        if self.buffer.has_next() and is_not_alpha_or_num(self.buffer.current_char()):
             lexeme = self.find_lexeme_or_add(self.buffer.get_text(started_point, self.buffer.pointer))
             self.token_repository.add_token(lexeme, self.buffer.line_number)
             return lexeme
@@ -71,8 +70,7 @@ class Tokenizer:
             else:
                 break
         # check token is a number or lexical error
-        current_char = self.buffer.current_char()
-        if current_char in SYMBOLS or current_char in SPACES or current_char in COMMENTS:
+        if self.buffer.has_next() and is_not_alpha_or_num(self.buffer.current_char()):
             number = 'NUM', self.buffer.get_text(started_point, self.buffer.pointer)
             self.token_repository.add_token(number, self.buffer.line_number)
             return number
@@ -86,9 +84,8 @@ class Tokenizer:
         # check symbol is == or =
         current_char = self.buffer.current_char()
         if current_char == '=':
-            next_char = self.buffer.get_char_at(self.buffer.pointer + 1)
-            if next_char == '=':
-                symbol = 'SYMBOL', self.buffer.get_text(self.buffer.pointer, self.buffer.pointer + 2)
+            if self.buffer.has_next(1) and self.buffer.get_char_at(self.buffer.pointer + 1) == '=':
+                symbol = 'SYMBOL', self.buffer.text[self.buffer.pointer, self.buffer.pointer + 2]
                 self.buffer.push_forward(2)
                 self.token_repository.add_token(symbol, self.buffer.line_number)
                 return symbol
@@ -98,7 +95,8 @@ class Tokenizer:
                 self.token_repository.add_token(symbol, self.buffer.line_number)
                 return symbol
         # check symbol is an */ (unmatched comment) or *
-        elif current_char == '*' and self.buffer.get_char_at(self.buffer.pointer + 1) == '/':
+        elif current_char == '*' and self.buffer.has_next(1) and self.buffer.get_char_at(
+                self.buffer.pointer + 1) == '/':
             self.buffer.push_forward(2)
             self.error_handler.add_lexical_error(('*/', 'Unmatched comment'), self.buffer.line_number)
         else:
@@ -108,9 +106,8 @@ class Tokenizer:
             return symbol
 
     def ignore_comment(self):
-        next_char = self.buffer.get_char_at(self.buffer.pointer + 1)
         # check comment is //
-        if next_char == '/':
+        if self.buffer.has_next(1) and self.buffer.get_char_at(self.buffer.pointer + 1) == '/':
             self.buffer.push_forward(2)
             started_point = self.buffer.pointer
             for char in self.buffer.text[started_point:]:
@@ -119,7 +116,7 @@ class Tokenizer:
                     self.buffer.increase_line_number()
                     break
         # check comment is /*
-        elif next_char == '*':
+        elif self.buffer.has_next(1) and self.buffer.get_char_at(self.buffer.pointer + 1) == '*':
             self.buffer.push_forward(2)
             started_point = self.buffer.pointer
             for char in self.buffer.text[started_point:]:
@@ -148,8 +145,13 @@ class Tokenizer:
             return 'KEYWORD', name
 
 
+def is_not_alpha_or_num(char):
+    if char in SYMBOLS or char in SPACES or char in COMMENTS:
+        return True
+    return False
+
+
 def write_tokens(token_repository):
-    tokens_file = ""
     if token_repository.has_any():
         tokens_file = str(token_repository)
     else:
@@ -158,7 +160,6 @@ def write_tokens(token_repository):
 
 
 def write_lexical_errors(error_handler):
-    lexical_file = ""
     if error_handler.has_any_error():
         lexical_file = str(error_handler)
     else:

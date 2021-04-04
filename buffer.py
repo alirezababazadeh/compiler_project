@@ -4,8 +4,8 @@ class Buffer:
         self.pointer = 0
         self.line_number = 1
 
-    def has_next(self):
-        return self.pointer < len(self.text)
+    def has_next(self, index=0):
+        return self.pointer + index < len(self.text)
 
     def current_char(self):
         return self.text[self.pointer]
