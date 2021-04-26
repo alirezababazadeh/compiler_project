@@ -3,3 +3,7 @@ SYMBOLS = {';', ':', ',', '[', ']', '(', ')', '{', '}', '+', '-', '*', '=', '<'}
 SPACES = {' ', '\r', '\f', '\t', '\v', '\n'}
 LINE_BREAKS = {'\n'}
 COMMENTS = {'/'}
+
+EOF = '$'
+EPSLION = 'ε'
+SYNCH = 'synch'
