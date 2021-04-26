@@ -1,4 +1,5 @@
 from compiler import Tokenizer
+from consts import EPSILON
 
 
 class Parser:
@@ -41,7 +42,7 @@ class ProcedureRepository:
                     else:
                         self.run_procedure(self.procedures[alphabet])
             elif self.lookahead in production_rule.follow:
-                if "epsilon" in production_rule.follow:
+                if EPSILON in production_rule.follow:
                     return
                 else:
                     print(f'missing {procedure.name} on line {self.lookahead.line_no}')

@@ -5,5 +5,5 @@ LINE_BREAKS = {'\n'}
 COMMENTS = {'/'}
 
 EOF = '$'
-EPSLION = 'ε'
+EPSILON = 'ε'
 SYNCH = 'synch'
