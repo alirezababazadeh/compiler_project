@@ -1,8 +1,17 @@
 # from anytree import Node
+class FlatTree:
+    def __init__(self):
+        self.tree = []
+
+    def add_node(self, node):
+        self.tree.append(node)
+
+    def __str__(self):
+        return render(fold(self.tree))
 
 
 def toleave(branch):
-    if branch[1:] == []:
+    if not branch[1:]:
         return [branch[0]]
     else:
         return [toleave(branch[1:])]
@@ -10,7 +19,7 @@ def toleave(branch):
 
 # fold the flattened tree
 def fold(flattened_tree):
-    if flattened_tree == []:
+    if not flattened_tree:
         return []
     else:
         return toleave(flattened_tree[0]) + fold(flattened_tree[1:])
@@ -39,7 +48,7 @@ def render(f):
 def tree_render(tree):
     if not isinstance(tree, list):
         return tree
-    elif tree == []:
+    elif not tree:
         return []
     else:
         return [tree_render(tree[0])] + [tree_render(tree[1:])]
