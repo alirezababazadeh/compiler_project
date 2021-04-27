@@ -2,6 +2,7 @@ from buffer import Buffer
 from compiler import Tokenizer
 from consts import EPSILON, KEYWORDS
 from error_handler import ErrorHandler
+from procedures import PROCEDURES, START, TERMINALS
 from symbol_table import SymbolTable
 from token_repo import TokenRepository
 from tree import FlatTree
@@ -77,7 +78,7 @@ def main():
     error_handler = ErrorHandler()
     token_repository = TokenRepository()
     tokenizer = Tokenizer(buffer, token_repository, error_handler, symbol_table)
-    procedure_repo = ProcedureRepository(tokenizer)
+    procedure_repo = ProcedureRepository(tokenizer, PROCEDURES, START, TERMINALS)
     parser = Parser(procedure_repo)
     parser.parse()
 
