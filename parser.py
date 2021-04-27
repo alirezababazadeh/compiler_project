@@ -32,15 +32,17 @@ class ProcedureRepository:
         self.temp_tree.append(procedure.name)
         has_matched = False
         for production_rule in procedure.production_rules:
-            if self.lookahead[1] in production_rule.first:
+            if (self.lookahead[1] in TERMINALS and self.lookahead[1] in production_rule.first) or \
+                    self.lookahead[0] in production_rule.first:
                 has_matched = True
                 for alphabet in production_rule.sentence:
                     if alphabet in self.terminals:
-                        self.match(production_rule.first)
+                        self.match(alphabet)
                     else:
                         self.run_procedure(self.procedures[alphabet].name)
         if not has_matched:
-            if self.lookahead[1] in procedure.follow:
+            if (self.lookahead[1] in TERMINALS and self.lookahead[1] in procedure.follow) or \
+                    self.lookahead[0] in procedure.follow:
                 if not procedure.has_epsilon_in_first:
                     print(f'missing {procedure.name} on line {self.tokenizer.buffer.line_number}')
             else:
@@ -49,8 +51,8 @@ class ProcedureRepository:
                 self.run_procedure(procedure.name)
         self.temp_tree.pop()
 
-    def match(self, expected_tokens):
-        if self.lookahead[1] in expected_tokens:
+    def match(self, expected_token):
+        if (expected_token in TERMINALS and self.lookahead[1] == expected_token) or self.lookahead[0] == expected_token:
             self.lookahead = self.tokenizer.get_next_token()
             self.tree.add_node(self.temp_tree.copy())
         else:
