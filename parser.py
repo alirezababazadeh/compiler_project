@@ -4,6 +4,7 @@ from consts import EPSILON, KEYWORDS
 from error_handler import ErrorHandler
 from symbol_table import SymbolTable
 from token_repo import TokenRepository
+from tree import FlatTree
 
 
 class Parser:
@@ -29,13 +30,13 @@ class ProductionRule:
 
 
 class ProcedureRepository:
-    def __init__(self, procedures, start, terminals, tokenizer, flat_tree):
+    def __init__(self, tokenizer, procedures, start, terminals):
         self.procedures = procedures
         self.start = start
         self.tokenizer = tokenizer
         self.terminals = terminals
         self.lookahead = tokenizer.get_next_token()
-        self.tree = flat_tree
+        self.tree = FlatTree()
         self.temp_tree = []
 
     def run_procedure(self, procedure):
@@ -76,8 +77,9 @@ def main():
     error_handler = ErrorHandler()
     token_repository = TokenRepository()
     tokenizer = Tokenizer(buffer, token_repository, error_handler, symbol_table)
-    procedure_repo = ProcedureRepository()
-    parser = Parser()
+    procedure_repo = ProcedureRepository(tokenizer)
+    parser = Parser(procedure_repo)
+    parser.parse()
 
 
 if __name__ == '__main__':
