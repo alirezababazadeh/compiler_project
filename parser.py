@@ -18,7 +18,8 @@ class Parser:
 
 
 class Procedure:
-    def __init__(self, name, production_rules, follow):
+    def __init__(self, name, production_rules, follow, has_epsilon_in_first):
+        self.has_epsilon_in_first = has_epsilon_in_first
         self.name = name
         self.production_rules = production_rules
         self.follow = follow
@@ -31,16 +32,17 @@ class ProductionRule:
 
 
 class ProcedureRepository:
-    def __init__(self, tokenizer, procedures, start, terminals):
+    def __init__(self, tokenizer, procedures, start_name, terminals):
         self.procedures = procedures
-        self.start = start
+        self.start = start_name
         self.tokenizer = tokenizer
         self.terminals = terminals
         self.lookahead = tokenizer.get_next_token()
         self.tree = FlatTree()
         self.temp_tree = []
 
-    def run_procedure(self, procedure):
+    def run_procedure(self, procedure_name):
+        procedure = self.procedures[procedure_name]
         self.temp_tree.append(procedure.name)
         for production_rule in procedure.production_rules:
             if self.lookahead in production_rule.first:
@@ -49,13 +51,13 @@ class ProcedureRepository:
                         self.match(production_rule.first)
                     else:
                         self.run_procedure(self.procedures[alphabet])
-            elif self.lookahead in production_rule.follow:
-                if EPSILON not in production_rule.follow:
-                    print(f'missing {procedure.name} on line {self.lookahead.line_no}')
-            else:
-                print(f'illegal lookahead on line {self.lookahead.line_no}')
-                self.lookahead = self.tokenizer.get_next_token()
-                self.run_procedure(procedure)
+        if self.lookahead in procedure.follow:
+            if not procedure.has_epsilon_in_first:
+                print(f'missing {procedure.name} on line {self.lookahead.line_no}')
+        else:
+            print(f'illegal lookahead on line {self.lookahead.line_no}')
+            self.lookahead = self.tokenizer.get_next_token()
+            self.run_procedure(procedure)
         self.temp_tree.pop()
 
     def match(self, expected_tokens):
