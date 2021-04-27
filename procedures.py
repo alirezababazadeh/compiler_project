@@ -196,7 +196,6 @@ PROCEDURES = {
                         ],
                        ['ID', 'NUM', '(', '+', '-'],
                        False),
-    # started
     "Additive-expression": Procedure("Additive-expression",
                                      [ProductionRule(['ID', 'NUM', '(', '+', '-'], ['Term', 'D']),
                                       ],
