@@ -1,8 +1,21 @@
-from parser import Procedure, ProductionRule
-
 START = 'Program'
 TERMINALS = {'$', 'ID', ';', '[', 'NUM', ']', '(', ')', 'int', 'void', ',', '{', '}', 'break', 'if', 'else', 'while',
              'return', 'for', '=', '<', '==', '+', '-', '*', 'ε'}
+
+
+class Procedure:
+    def __init__(self, name, production_rules, follow, has_epsilon_in_first):
+        self.has_epsilon_in_first = has_epsilon_in_first
+        self.name = name
+        self.production_rules = production_rules
+        self.follow = follow
+
+
+class ProductionRule:
+    def __init__(self, first, sentence):
+        self.first = first
+        self.sentence = sentence
+
 
 PROCEDURES = {
     "Program": Procedure("Program",

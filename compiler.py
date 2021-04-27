@@ -46,6 +46,7 @@ class Tokenizer:
             else:
                 self.error_handler.add_lexical_error((current_char, 'Invalid input'), self.buffer.line_number)
                 self.buffer.push_forward()
+        return EOF
 
     def tokenize_id_keyword(self):
         started_point = self.buffer.pointer

@@ -2,10 +2,10 @@ from buffer import Buffer
 from compiler import Tokenizer
 from consts import EPSILON, KEYWORDS
 from error_handler import ErrorHandler
-from procedures import PROCEDURES, START, TERMINALS
+from procedures import PROCEDURES, START, TERMINALS, Procedure, ProductionRule
 from symbol_table import SymbolTable
 from token_repo import TokenRepository
-from tree import FlatTree
+from tree import FlatTree, tree_render, fold
 
 
 class Parser:
@@ -14,21 +14,7 @@ class Parser:
 
     def parse(self):
         self.procedure_repository.run_procedure(self.procedure_repository.start)
-        print(self.procedure_repository.tree)
-
-
-class Procedure:
-    def __init__(self, name, production_rules, follow, has_epsilon_in_first):
-        self.has_epsilon_in_first = has_epsilon_in_first
-        self.name = name
-        self.production_rules = production_rules
-        self.follow = follow
-
-
-class ProductionRule:
-    def __init__(self, first, sentence):
-        self.first = first
-        self.sentence = sentence
+        tree_render(fold(self.procedure_repository.tree.tree))
 
 
 class ProcedureRepository:
@@ -44,28 +30,31 @@ class ProcedureRepository:
     def run_procedure(self, procedure_name):
         procedure = self.procedures[procedure_name]
         self.temp_tree.append(procedure.name)
+        has_matched = False
         for production_rule in procedure.production_rules:
-            if self.lookahead in production_rule.first:
+            if self.lookahead[1] in production_rule.first:
+                has_matched = True
                 for alphabet in production_rule.sentence:
                     if alphabet in self.terminals:
                         self.match(production_rule.first)
                     else:
-                        self.run_procedure(self.procedures[alphabet])
-        if self.lookahead in procedure.follow:
-            if not procedure.has_epsilon_in_first:
-                print(f'missing {procedure.name} on line {self.lookahead.line_no}')
-        else:
-            print(f'illegal lookahead on line {self.lookahead.line_no}')
-            self.lookahead = self.tokenizer.get_next_token()
-            self.run_procedure(procedure)
+                        self.run_procedure(self.procedures[alphabet].name)
+        if not has_matched:
+            if self.lookahead[1] in procedure.follow:
+                if not procedure.has_epsilon_in_first:
+                    print(f'missing {procedure.name} on line {self.tokenizer.buffer.line_number}')
+            else:
+                print(f'illegal lookahead on line {self.tokenizer.buffer.line_number}')
+                self.lookahead = self.tokenizer.get_next_token()
+                self.run_procedure(procedure.name)
         self.temp_tree.pop()
 
     def match(self, expected_tokens):
-        if self.lookahead in expected_tokens:
+        if self.lookahead[1] in expected_tokens:
             self.lookahead = self.tokenizer.get_next_token()
-            self.tree.add_node(self.temp_tree)
+            self.tree.add_node(self.temp_tree.copy())
         else:
-            print(f'missing expected_token on line {self.lookahead.line_no}')
+            print(f'missing expected_token on line {self.tokenizer.buffer.line_number}')
 
 
 output_path = ''

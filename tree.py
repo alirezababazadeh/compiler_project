@@ -6,9 +6,6 @@ class FlatTree:
     def add_node(self, node):
         self.tree.append(node)
 
-    def __str__(self):
-        return render(fold(self.tree))
-
 
 def toleave(branch):
     if not branch[1:]:
