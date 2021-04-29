@@ -45,6 +45,10 @@ class ProcedureRepository:
                     self.lookahead[0] in procedure.follow:
                 if not procedure.has_epsilon_in_first:
                     print(f'missing {procedure.name} on line {self.tokenizer.buffer.line_number}')
+                else:
+                    copy = self.temp_tree.copy()
+                    copy.append("epsilon")
+                    self.tree.add_node(copy)
             else:
                 print(f'illegal lookahead on line {self.tokenizer.buffer.line_number}')
                 self.lookahead = self.tokenizer.get_next_token()
@@ -53,8 +57,10 @@ class ProcedureRepository:
 
     def match(self, expected_token):
         if (expected_token in TERMINALS and self.lookahead[1] == expected_token) or self.lookahead[0] == expected_token:
+            copy = self.temp_tree.copy()
+            copy.append(self.lookahead)
+            self.tree.add_node(copy)
             self.lookahead = self.tokenizer.get_next_token()
-            self.tree.add_node(self.temp_tree.copy())
         else:
             print(f'missing expected_token on line {self.tokenizer.buffer.line_number}')
 
