@@ -1,5 +1,5 @@
 from buffer import Buffer
-from error_handler import ErrorHandler
+from error_handler import LexicalErrorHandler
 from symbol_table import SymbolTable
 from consts import *
 from token_repo import TokenRepository
@@ -194,7 +194,7 @@ def write_symbol_table(symbol_table, number):
 def main(program_text, number):
     buffer = Buffer(program_text)
     symbol_table = SymbolTable(KEYWORDS)
-    error_handler = ErrorHandler()
+    error_handler = LexicalErrorHandler()
     token_repository = TokenRepository()
     tokenizer = Tokenizer(buffer, token_repository, error_handler, symbol_table)
     while buffer.has_next():

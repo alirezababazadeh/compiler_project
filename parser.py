@@ -1,7 +1,7 @@
 from buffer import Buffer
 from scanner import Tokenizer
 from consts import EPSILON, KEYWORDS
-from error_handler import ErrorHandler
+from error_handler import LexicalErrorHandler, SyntaxErrorHandler
 from procedures import PROCEDURES, START, TERMINALS, Procedure, ProductionRule
 from symbol_table import SymbolTable
 from token_repo import TokenRepository
@@ -15,6 +15,7 @@ class Parser:
     def parse(self):
         self.procedure_repository.run_procedure(self.procedure_repository.start)
         TreeRenderer(self.procedure_repository.tree_generator.tree).write_to_file('parse_tree.txt')
+        self.procedure_repository.error_handler.write_to_file("syntax_errors.txt")
 
 
 class ProcedureRepository:
@@ -25,6 +26,7 @@ class ProcedureRepository:
         self.terminals = terminals
         self.lookahead = tokenizer.get_next_token()
         self.tree_generator = TreeGenerator()
+        self.error_handler = SyntaxErrorHandler()
 
     def run_procedure(self, procedure_name):
         if self.lookahead[1] == '$':
@@ -45,7 +47,8 @@ class ProcedureRepository:
         if not has_matched:
             if self.lookahead[1] in procedure.follow or self.lookahead[0] in procedure.follow:
                 if not procedure.has_epsilon_in_first:
-                    print(f'missing {procedure.name} on line {self.tokenizer.buffer.line_number}')
+                    self.error_handler.add_syntax_error(f"missing {procedure.name}", self.tokenizer.buffer.line_number)
+                    # print(f'missing {procedure.name} on line {self.tokenizer.buffer.line_number}')
                 else:
                     if procedure.has_epsilon_rule:
                         self.tree_generator.add_node("epsilon")
@@ -57,23 +60,35 @@ class ProcedureRepository:
                                     self.run_procedure(self.procedures[alphabet].name)
             else:
                 self.tree_generator.delete_node()
-                print(f'illegal lookahead on line {self.tokenizer.buffer.line_number}')
+                if self.lookahead[1] in TERMINALS:
+                    self.error_handler.add_syntax_error(f"illegal {self.lookahead[1]}",
+                                                        self.tokenizer.buffer.line_number)
+                else:
+                    self.error_handler.add_syntax_error(f"illegal {self.lookahead[0]}",
+                                                        self.tokenizer.buffer.line_number)
+                # print(f'illegal lookahead on line {self.tokenizer.buffer.line_number}')
                 self.lookahead = self.tokenizer.get_next_token()
                 self.run_procedure(procedure.name)
                 return
         self.tree_generator.level_up()
 
     def match(self, expected_token):
-        if (expected_token in TERMINALS and self.lookahead[1] == expected_token) or self.lookahead[0] == expected_token:
+        if self.lookahead[1] == "$":
+            self.tree_generator.add_node('$')
+            self.tree_generator.level_up()
+            self.lookahead = self.tokenizer.get_next_token()
+        elif (expected_token in TERMINALS and self.lookahead[1] == expected_token) or \
+                self.lookahead[0] == expected_token:
             self.tree_generator.add_node(f'({self.lookahead[0]}, {self.lookahead[1]}) ')
             self.tree_generator.level_up()
             self.lookahead = self.tokenizer.get_next_token()
         else:
-            print(f'missing expected_token on line {self.tokenizer.buffer.line_number}')
+            self.error_handler.add_syntax_error(f"missing {expected_token}", self.tokenizer.buffer.line_number)
+            # print(f'missing expected_token on line {self.tokenizer.buffer.line_number}')
 
 
-output_path = 'parser/'
-input_path = 'PA2_Resources/T2/input.txt'
+output_path = ''
+input_path = 'input.txt'
 
 
 def main():
@@ -81,7 +96,7 @@ def main():
 
     buffer = Buffer(program_text)
     symbol_table = SymbolTable(KEYWORDS)
-    error_handler = ErrorHandler()
+    error_handler = LexicalErrorHandler()
     token_repository = TokenRepository()
     tokenizer = Tokenizer(buffer, token_repository, error_handler, symbol_table)
     procedure_repo = ProcedureRepository(tokenizer, PROCEDURES, START, TERMINALS)
