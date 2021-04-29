@@ -29,8 +29,6 @@ class ProcedureRepository:
         self.error_handler = SyntaxErrorHandler()
 
     def run_procedure(self, procedure_name):
-        if self.lookahead[1] == '$':
-            return
         procedure = self.procedures[procedure_name]
         self.tree_generator.add_node(procedure_name)
         has_matched = False
@@ -47,7 +45,9 @@ class ProcedureRepository:
         if not has_matched:
             if self.lookahead[1] in procedure.follow or self.lookahead[0] in procedure.follow:
                 if not procedure.has_epsilon_in_first:
+                    self.tree_generator.delete_node()
                     self.error_handler.add_syntax_error(f"missing {procedure.name}", self.tokenizer.buffer.line_number)
+                    return
                     # print(f'missing {procedure.name} on line {self.tokenizer.buffer.line_number}')
                 else:
                     if procedure.has_epsilon_rule:
@@ -55,9 +55,11 @@ class ProcedureRepository:
                         self.tree_generator.level_up()
                     else:
                         for production_rule in procedure.production_rules:
-                            for alphabet in production_rule.sentence:
-                                if alphabet not in self.terminals and self.procedures[alphabet].has_epsilon_in_first:
-                                    self.run_procedure(self.procedures[alphabet].name)
+                            alphabet = production_rule.sentence[0]
+                            if alphabet not in self.terminals and self.procedures[alphabet].has_epsilon_in_first:
+                                for new_alphabet in production_rule.sentence:
+                                    self.run_procedure(self.procedures[new_alphabet].name)
+                                break
             else:
                 self.tree_generator.delete_node()
                 if self.lookahead[1] in TERMINALS:
@@ -88,7 +90,7 @@ class ProcedureRepository:
 
 
 output_path = ''
-input_path = 'input.txt'
+input_path = 'PA2_Resources/T6/input.txt'
 
 
 def main():

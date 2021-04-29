@@ -20,20 +20,20 @@ class ProductionRule:
 
 PROCEDURES = {
     "Program": Procedure("Program",
-                         [ProductionRule(['int', 'void'], ['Declaration-list'])
+                         [ProductionRule(['int', 'void', '$'], ['Declaration-list', '$'])
                           ],
                          ['$'],
                          False, False),
     "Declaration-list": Procedure("Declaration-list",
                                   [ProductionRule(['int', 'void'], ['Declaration', 'Declaration-list'])
                                    ],
-                                  ['ID', ';', 'NUM', '(', '{', '}', 'break', 'if', 'while', 'return', 'for', '+',
+                                  ['$', 'ID', ';', 'NUM', '(', '{', '}', 'break', 'if', 'while', 'return', 'for', '+',
                                    '-'],
                                   True, True),
     "Declaration": Procedure("Declaration",
                              [ProductionRule(['int', 'void'], ['Declaration-initial', 'Declaration-prime'])
                               ],
-                             ['ID', ';', 'NUM', '(', 'int', 'void', '{', '}', 'break', 'if', 'while', 'return',
+                             ['$', 'ID', ';', 'NUM', '(', 'int', 'void', '{', '}', 'break', 'if', 'while', 'return',
                               'for', '+', '-'],
                              False, False),
     "Declaration-initial": Procedure("Declaration-initial",
@@ -45,20 +45,20 @@ PROCEDURES = {
                                    [ProductionRule([';', '['], ['Var-declaration-prime']),
                                     ProductionRule(['('], ['Fun-declaration-prime'])
                                     ],
-                                   ['ID', ';', 'NUM', '(', 'int', 'void', '{', '}', 'break', 'if', 'while',
+                                   ['$', 'ID', ';', 'NUM', '(', 'int', 'void', '{', '}', 'break', 'if', 'while',
                                     'return', 'for', '+', '-'],
                                    False, False),
     "Var-declaration-prime": Procedure("Var-declaration-prime",
                                        [ProductionRule([';'], [';']),
                                         ProductionRule(['['], ['[', 'NUM', ']', ';'])
                                         ],
-                                       ['ID', ';', 'NUM', '(', 'int', 'void', '{', '}', 'break', 'if', 'while',
+                                       ['$', 'ID', ';', 'NUM', '(', 'int', 'void', '{', '}', 'break', 'if', 'while',
                                         'return', 'for', '+', '-'],
                                        False, False),
     "Fun-declaration-prime": Procedure("Fun-declaration-prime",
                                        [ProductionRule(['('], ['(', 'Params', ')', 'Compound-stmt'])
                                         ],
-                                       ['ID', ';', 'NUM', '(', 'int', 'void', '{', '}', 'break', 'if', 'while',
+                                       ['$', 'ID', ';', 'NUM', '(', 'int', 'void', '{', '}', 'break', 'if', 'while',
                                         'return', 'for', '+', '-'],
                                        False, False),
     "Type-specifier": Procedure("Type-specifier",
@@ -96,7 +96,7 @@ PROCEDURES = {
     "Compound-stmt": Procedure("Compound-stmt",
                                [ProductionRule(['{'], ['{', 'Declaration-list', 'Statement-list', '}'])
                                 ],
-                               ['ID', ';', 'NUM', '(', 'int', 'void', '{', '}', 'break', 'if', 'else', 'while',
+                               ['$', 'ID', ';', 'NUM', '(', 'int', 'void', '{', '}', 'break', 'if', 'else', 'while',
                                 'return', 'for', '+', '-'],
                                False),
     "Statement-list": Procedure("Statement-list",
@@ -226,7 +226,7 @@ PROCEDURES = {
                                             [';', ']', ')', ',', '<', '=='],
                                             False),
     "D": Procedure("D",
-                   [ProductionRule(['NUM', '(', '+', '-'], ['Addop', 'Term', 'D']),
+                   [ProductionRule(['+', '-'], ['Addop', 'Term', 'D']),
                     ],
                    [';', ']', ')', ',', '<', '=='],
                    True, True),
