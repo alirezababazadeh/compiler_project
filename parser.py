@@ -1,5 +1,5 @@
 from buffer import Buffer
-from compiler import Tokenizer
+from scanner import Tokenizer
 from consts import EPSILON, KEYWORDS
 from error_handler import ErrorHandler
 from procedures import PROCEDURES, START, TERMINALS, Procedure, ProductionRule
@@ -63,7 +63,7 @@ class ProcedureRepository:
 
 
 output_path = ''
-input_path = 'input.txt'
+input_path = 'PA2_Resources/T7/input.txt'
 
 
 def main():

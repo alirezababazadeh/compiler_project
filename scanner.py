@@ -4,8 +4,8 @@ from symbol_table import SymbolTable
 from consts import *
 from token_repo import TokenRepository
 
-output_path = ''
-input_path = 'input.txt'
+output_path = 'scanner/'
+input_path = 'PA1_test_programs/'
 
 
 class Tokenizer:
@@ -93,11 +93,6 @@ class Tokenizer:
                 self.buffer.push_forward(2)
                 self.token_repository.add_token(symbol, self.buffer.line_number)
                 return symbol
-            elif self.buffer.has_next(1) and not is_valid_input(self.buffer.get_char_at(self.buffer.pointer + 1)):
-                self.buffer.push_forward(2)
-                self.error_handler.add_lexical_error(
-                    (self.buffer.get_text(self.buffer.pointer - 2, self.buffer.pointer), 'Invalid input'),
-                    self.buffer.line_number)
             else:
                 symbol = 'SYMBOL', current_char
                 self.buffer.push_forward()
@@ -108,12 +103,6 @@ class Tokenizer:
                 self.buffer.pointer + 1) == '/':
             self.buffer.push_forward(2)
             self.error_handler.add_lexical_error(('*/', 'Unmatched comment'), self.buffer.line_number)
-        elif current_char == '*' and self.buffer.has_next(1) and not is_valid_input(
-                self.buffer.get_char_at(self.buffer.pointer + 1)):
-            self.buffer.push_forward(2)
-            self.error_handler.add_lexical_error(
-                (self.buffer.get_text(self.buffer.pointer - 2, self.buffer.pointer), 'Invalid input'),
-                self.buffer.line_number)
         else:
             symbol = 'SYMBOL', current_char
             self.buffer.push_forward()
@@ -155,9 +144,9 @@ class Tokenizer:
             else:
                 self.buffer.increase_line_number(to_be_increase_line)
         # none of // or /*, so it is lexical error
-        elif self.buffer.has_next(1) and not is_valid_input(
-                self.buffer.get_char_at(self.buffer.pointer + 1)) and not str.isalpha(
-            self.buffer.get_char_at(self.buffer.pointer + 1)):
+        elif self.buffer.has_next(1) and \
+                not is_valid_input(self.buffer.get_char_at(self.buffer.pointer + 1)) and \
+                not str.isalpha(self.buffer.get_char_at(self.buffer.pointer + 1)):
             self.buffer.push_forward(2)
             self.error_handler.add_lexical_error(
                 (self.buffer.get_text(self.buffer.pointer - 2, self.buffer.pointer), 'Invalid input'),
@@ -181,30 +170,28 @@ def is_valid_input(char):
     return False
 
 
-def write_tokens(token_repository):
+def write_tokens(token_repository, number):
     if token_repository.has_any():
         tokens_file = str(token_repository)
     else:
         tokens_file = "There is no token."
-    open(output_path + 'tokens.txt', 'w').write(tokens_file)
+    open(output_path + f'T{number}/tokens.txt', 'w').write(tokens_file)
 
 
-def write_lexical_errors(error_handler):
+def write_lexical_errors(error_handler, number):
     if error_handler.has_any_error():
         lexical_file = str(error_handler)
     else:
         lexical_file = "There is no lexical error."
 
-    open(output_path + 'lexical_errors.txt', 'w').write(lexical_file)
+    open(output_path + f'T{number}/lexical_errors.txt', 'w').write(lexical_file)
 
 
-def write_symbol_table(symbol_table):
-    open(output_path + 'symbol_table.txt', 'w').write(str(symbol_table))
+def write_symbol_table(symbol_table, number):
+    open(output_path + f'T{number}/symbol_table.txt', 'w').write(str(symbol_table))
 
 
-def main():
-    program_text = open(input_path).read()
-
+def main(program_text, number):
     buffer = Buffer(program_text)
     symbol_table = SymbolTable(KEYWORDS)
     error_handler = ErrorHandler()
@@ -213,11 +200,20 @@ def main():
     while buffer.has_next():
         tokenizer.get_next_token()
 
-    write_tokens(token_repository)
-    write_lexical_errors(error_handler)
-    write_symbol_table(symbol_table)
+    write_tokens(token_repository, number)
+    write_lexical_errors(error_handler, number)
+    write_symbol_table(symbol_table, number)
 
 
 # test
 if __name__ == '__main__':
-    main()
+    i = 0
+    result = []
+    while i < 10:
+        path = input_path + f"T{i}/input.txt"
+        input_text = open(path).read()
+        main(input_text, i)
+        result.append((i, open(f'PA1_test_programs/T{i}/tokens.txt').read().rstrip() ==
+                       open(f'scanner/T{i}/tokens.txt').read().rstrip()))
+        i += 1
+    print(result)
