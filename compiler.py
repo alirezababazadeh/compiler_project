@@ -90,7 +90,7 @@ class ProcedureRepository:
 
 
 output_path = ''
-input_path = 'PA2_Resources/T6/input.txt'
+input_path = 'input.txt'
 
 
 def main():
