@@ -1,70 +1,65 @@
 # from anytree import Node
-class FlatTree:
+from anytree import Node, RenderTree
+
+
+class InternalNode:
+    def __init__(self, name, father):
+        self.father = father
+        self.name = name
+        self.children = []
+
+    def add_child(self, node):
+        self.children.append(node)
+
+
+class Tree:
     def __init__(self):
-        self.tree = []
+        self.root = None
 
-    def add_node(self, node):
-        self.tree.append(node)
-
-
-def toleave(branch):
-    if not branch[1:]:
-        return [branch[0]]
-    else:
-        return [toleave(branch[1:])]
+    def set_root(self, node):
+        self.root = node
 
 
-# fold the flattened tree
-def fold(flattened_tree):
-    if not flattened_tree:
-        return []
-    else:
-        return toleave(flattened_tree[0]) + fold(flattened_tree[1:])
+class TreeGenerator:
+    def __init__(self):
+        self.current_node = None
+        self.tree = Tree()
+
+    def add_node(self, node_name):
+        if self.current_node is None:
+            root = InternalNode(node_name, None)
+            self.tree.set_root(root)
+            self.current_node = root
+        else:
+            node = InternalNode(node_name, self.current_node)
+            self.current_node.add_child(node)
+            self.current_node = node
+
+    def level_up(self):
+        # if self.current_node.father is None:
+        #     raise Exception("root node doesn't have any father")
+        self.current_node = self.current_node.father
 
 
-# decorator for rendering
-def render(f):
-    render.level = -2
-    indent = '   '
+class TreeRenderer:
+    def __init__(self, tree):
+        self.tree = tree
+        self.root = Node(self.tree.root.name)
 
-    def _f(*args):
-        render.level += 1
-        try:
-            result = f(*args)
-            if not isinstance(result, list):
-                print(render.level * indent, result)
-        finally:
-            render.level = -2
-        return result
+    def render(self):
+        current_node = self.root
+        internal_current_node = self.tree.root
+        self.recursive_renderer(internal_current_node, current_node)
 
-    return _f
+        tree_string = ''
+        for pre, _, node in RenderTree(self.root):
+            tree_string += f"{pre}{node.name}\n"
+        return tree_string
 
+    def recursive_renderer(self, internal_current_node, any_tree_current_node):
+        for child in internal_current_node.children:
+            new_node = Node(child.name, parent=any_tree_current_node)
+            self.recursive_renderer(child, new_node)
 
-# go over a tree and render it
-@render
-def tree_render(tree):
-    if not isinstance(tree, list):
-        return tree
-    elif not tree:
-        return []
-    else:
-        return [tree_render(tree[0])] + [tree_render(tree[1:])]
-
-
-def main():
-    flattened_tree = [[1], [1, 2], [1, 2, 5], [1, 2, 8], [1, 2, 5, 3], [1, 2, 6], [1, 2, 6, 7], [1, 2, 4]]
-    tree_render(fold(flattened_tree))
-
-
-# def main():
-#     udo = Node("Udo")
-#     marc = Node("Marc")
-#     lian = Node("Lian", parent=marc)
-#     print(RenderTree(udo))
-#     Node('/Udo')
-#     print(RenderTree(marc))
-#     Node('/Marc')
-
-
-if __name__ == '__main__':
-    main()
+    def write_to_file(self, path):
+        open(path, 'w', encoding='utf-8').write(self.render())

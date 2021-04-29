@@ -5,7 +5,7 @@ from error_handler import ErrorHandler
 from procedures import PROCEDURES, START, TERMINALS, Procedure, ProductionRule
 from symbol_table import SymbolTable
 from token_repo import TokenRepository
-from tree import FlatTree, tree_render, fold
+from tree import Tree, InternalNode, TreeGenerator, TreeRenderer
 
 
 class Parser:
@@ -14,7 +14,7 @@ class Parser:
 
     def parse(self):
         self.procedure_repository.run_procedure(self.procedure_repository.start)
-        tree_render(fold(self.procedure_repository.tree.tree))
+        TreeRenderer(self.procedure_repository.tree_generator.tree).write_to_file('parse_tree.txt')
 
 
 class ProcedureRepository:
@@ -24,12 +24,11 @@ class ProcedureRepository:
         self.tokenizer = tokenizer
         self.terminals = terminals
         self.lookahead = tokenizer.get_next_token()
-        self.tree = FlatTree()
-        self.temp_tree = []
+        self.tree_generator = TreeGenerator()
 
     def run_procedure(self, procedure_name):
         procedure = self.procedures[procedure_name]
-        self.temp_tree.append(procedure.name)
+        self.tree_generator.add_node(procedure_name)
         has_matched = False
         for production_rule in procedure.production_rules:
             if (self.lookahead[1] in TERMINALS and self.lookahead[1] in production_rule.first) or \
@@ -46,20 +45,18 @@ class ProcedureRepository:
                 if not procedure.has_epsilon_in_first:
                     print(f'missing {procedure.name} on line {self.tokenizer.buffer.line_number}')
                 else:
-                    copy = self.temp_tree.copy()
-                    copy.append("epsilon")
-                    self.tree.add_node(copy)
+                    self.tree_generator.add_node("epsilon")
+                    self.tree_generator.level_up()
             else:
                 print(f'illegal lookahead on line {self.tokenizer.buffer.line_number}')
                 self.lookahead = self.tokenizer.get_next_token()
                 self.run_procedure(procedure.name)
-        self.temp_tree.pop()
+        self.tree_generator.level_up()
 
     def match(self, expected_token):
         if (expected_token in TERMINALS and self.lookahead[1] == expected_token) or self.lookahead[0] == expected_token:
-            copy = self.temp_tree.copy()
-            copy.append(self.lookahead)
-            self.tree.add_node(copy)
+            self.tree_generator.add_node(f'({self.lookahead[0]}, {self.lookahead[1]}) ')
+            self.tree_generator.level_up()
             self.lookahead = self.tokenizer.get_next_token()
         else:
             print(f'missing expected_token on line {self.tokenizer.buffer.line_number}')
