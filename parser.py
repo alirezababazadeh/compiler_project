@@ -27,30 +27,40 @@ class ProcedureRepository:
         self.tree_generator = TreeGenerator()
 
     def run_procedure(self, procedure_name):
+        if self.lookahead[1] == '$':
+            return
         procedure = self.procedures[procedure_name]
         self.tree_generator.add_node(procedure_name)
         has_matched = False
         for production_rule in procedure.production_rules:
-            if (self.lookahead[1] in TERMINALS and self.lookahead[1] in production_rule.first) or \
-                    self.lookahead[0] in production_rule.first:
+            if self.lookahead[1] in production_rule.first or self.lookahead[0] in production_rule.first:
                 has_matched = True
                 for alphabet in production_rule.sentence:
                     if alphabet in self.terminals:
                         self.match(alphabet)
                     else:
                         self.run_procedure(self.procedures[alphabet].name)
+            if has_matched:
+                break
         if not has_matched:
-            if (self.lookahead[1] in TERMINALS and self.lookahead[1] in procedure.follow) or \
-                    self.lookahead[0] in procedure.follow:
+            if self.lookahead[1] in procedure.follow or self.lookahead[0] in procedure.follow:
                 if not procedure.has_epsilon_in_first:
                     print(f'missing {procedure.name} on line {self.tokenizer.buffer.line_number}')
                 else:
-                    self.tree_generator.add_node("epsilon")
-                    self.tree_generator.level_up()
+                    if procedure.has_epsilon_rule:
+                        self.tree_generator.add_node("epsilon")
+                        self.tree_generator.level_up()
+                    else:
+                        for production_rule in procedure.production_rules:
+                            for alphabet in production_rule.sentence:
+                                if alphabet not in self.terminals and self.procedures[alphabet].has_epsilon_in_first:
+                                    self.run_procedure(self.procedures[alphabet].name)
             else:
+                self.tree_generator.delete_node()
                 print(f'illegal lookahead on line {self.tokenizer.buffer.line_number}')
                 self.lookahead = self.tokenizer.get_next_token()
                 self.run_procedure(procedure.name)
+                return
         self.tree_generator.level_up()
 
     def match(self, expected_token):
@@ -62,8 +72,8 @@ class ProcedureRepository:
             print(f'missing expected_token on line {self.tokenizer.buffer.line_number}')
 
 
-output_path = ''
-input_path = 'PA2_Resources/T7/input.txt'
+output_path = 'parser/'
+input_path = 'PA2_Resources/T2/input.txt'
 
 
 def main():

@@ -4,11 +4,12 @@ TERMINALS = {'$', 'ID', ';', '[', 'NUM', ']', '(', ')', 'int', 'void', ',', '{',
 
 
 class Procedure:
-    def __init__(self, name, production_rules, follow, has_epsilon_in_first):
+    def __init__(self, name, production_rules, follow, has_epsilon_in_first, has_epsilon_rule=False):
         self.has_epsilon_in_first = has_epsilon_in_first
         self.name = name
         self.production_rules = production_rules
         self.follow = follow
+        self.has_epsilon_rule = has_epsilon_rule
 
 
 class ProductionRule:
@@ -19,83 +20,83 @@ class ProductionRule:
 
 PROCEDURES = {
     "Program": Procedure("Program",
-                         [ProductionRule(['int', 'void', '$'], ['Declaration-list', '$'])
+                         [ProductionRule(['int', 'void'], ['Declaration-list'])
                           ],
                          ['$'],
-                         False),
+                         False, False),
     "Declaration-list": Procedure("Declaration-list",
                                   [ProductionRule(['int', 'void'], ['Declaration', 'Declaration-list'])
                                    ],
-                                  ['$', 'ID', ';', 'NUM', '(', '{', '}', 'break', 'if', 'while', 'return', 'for', '+',
+                                  ['ID', ';', 'NUM', '(', '{', '}', 'break', 'if', 'while', 'return', 'for', '+',
                                    '-'],
-                                  True),
+                                  True, True),
     "Declaration": Procedure("Declaration",
                              [ProductionRule(['int', 'void'], ['Declaration-initial', 'Declaration-prime'])
                               ],
-                             ['$', 'ID', ';', 'NUM', '(', 'int', 'void', '{', '}', 'break', 'if', 'while', 'return',
+                             ['ID', ';', 'NUM', '(', 'int', 'void', '{', '}', 'break', 'if', 'while', 'return',
                               'for', '+', '-'],
-                             False),
+                             False, False),
     "Declaration-initial": Procedure("Declaration-initial",
                                      [ProductionRule(['int', 'void'], ['Type-specifier', 'ID'])
                                       ],
                                      [';', '[', '(', ')', ','],
-                                     False),
+                                     False, False),
     "Declaration-prime": Procedure("Declaration-prime",
                                    [ProductionRule([';', '['], ['Var-declaration-prime']),
                                     ProductionRule(['('], ['Fun-declaration-prime'])
                                     ],
-                                   ['$', 'ID', ';', 'NUM', '(', 'int', 'void', '{', '}', 'break', 'if', 'while',
+                                   ['ID', ';', 'NUM', '(', 'int', 'void', '{', '}', 'break', 'if', 'while',
                                     'return', 'for', '+', '-'],
-                                   False),
+                                   False, False),
     "Var-declaration-prime": Procedure("Var-declaration-prime",
                                        [ProductionRule([';'], [';']),
                                         ProductionRule(['['], ['[', 'NUM', ']', ';'])
                                         ],
-                                       ['$', 'ID', ';', 'NUM', '(', 'int', 'void', '{', '}', 'break', 'if', 'while',
+                                       ['ID', ';', 'NUM', '(', 'int', 'void', '{', '}', 'break', 'if', 'while',
                                         'return', 'for', '+', '-'],
-                                       False),
+                                       False, False),
     "Fun-declaration-prime": Procedure("Fun-declaration-prime",
                                        [ProductionRule(['('], ['(', 'Params', ')', 'Compound-stmt'])
                                         ],
-                                       ['$', 'ID', ';', 'NUM', '(', 'int', 'void', '{', '}', 'break', 'if', 'while',
+                                       ['ID', ';', 'NUM', '(', 'int', 'void', '{', '}', 'break', 'if', 'while',
                                         'return', 'for', '+', '-'],
-                                       False),
+                                       False, False),
     "Type-specifier": Procedure("Type-specifier",
                                 [ProductionRule(['int'], ['int']),
                                  ProductionRule(['void'], ['void'])
                                  ],
                                 ['ID'],
-                                False),
+                                False, False),
     "Params": Procedure("Params",
                         [ProductionRule(['int'], ['int', 'ID', 'Param-prime', 'Param-list']),
                          ProductionRule(['void'], ['void', 'Param-list-void-abtar'])
                          ],
                         [')'],
-                        False),
+                        False, False),
     "Param-list-void-abtar": Procedure("Param-list-void-abtar",
                                        [ProductionRule(['ID'], ['ID', 'Param-prime', 'Param-list'])
                                         ],
                                        [')'],
-                                       True),
+                                       True, True),
     "Param-list": Procedure("Param-list",
                             [ProductionRule([','], [',', 'Param', 'Param-list'])
                              ],
                             [')'],
-                            True),
+                            True, True),
     "Param": Procedure("Param",
                        [ProductionRule(['int', 'void'], ['Declaration-initial', 'Param-prime'])
                         ],
                        [')', ','],
-                       False),
+                       False, False),
     "Param-prime": Procedure("Param-prime",
                              [ProductionRule(['['], ['[', ']'])
                               ],
                              [')', ','],
-                             True),
+                             True, True),
     "Compound-stmt": Procedure("Compound-stmt",
                                [ProductionRule(['{'], ['{', 'Declaration-list', 'Statement-list', '}'])
                                 ],
-                               ['$', 'ID', ';', 'NUM', '(', 'int', 'void', '{', '}', 'break', 'if', 'else', 'while',
+                               ['ID', ';', 'NUM', '(', 'int', 'void', '{', '}', 'break', 'if', 'else', 'while',
                                 'return', 'for', '+', '-'],
                                False),
     "Statement-list": Procedure("Statement-list",
@@ -104,7 +105,7 @@ PROCEDURES = {
                                     ['Statement', 'Statement-list'])
                                 ],
                                 ['}'],
-                                True),
+                                True, True),
     "Statement": Procedure("Statement",
                            [ProductionRule(['ID', ',', 'NUM', '(', 'break', '+', '-'], ['Expression-stmt']),
                             ProductionRule(['{'], ['Compound-stmt']),
@@ -163,7 +164,7 @@ PROCEDURES = {
                             [ProductionRule([','], [',', 'Var', 'Var-zegond']),
                              ],
                             ['ID', ';', 'NUM', '(', '{', 'break', 'if', 'while', 'return', 'for', '+', '-'],
-                            True),
+                            True, True),
     "Var": Procedure("Var",
                      [ProductionRule(['ID'], ['ID', 'Var-prime']),
                       ],
@@ -194,15 +195,15 @@ PROCEDURES = {
                                           [';', ']', ')', ','],
                                           False),
     "Simple-expression-prime": Procedure("Simple-expression-prime",
-                                         [ProductionRule(['(', '+', '-', '*'], ['Additive-expression-prime', 'C']),
+                                         [ProductionRule(['(', '<', '==', '+', '-', '*'], ['Additive-expression-prime', 'C']),
                                           ],
                                          [';', ']', ')', ','],
                                          True),
     "C": Procedure("C",
-                   [ProductionRule(['(', '+', '-', '*'], ['Relop', 'Additive-expression']),
+                   [ProductionRule(['<', '=='], ['Relop', 'Additive-expression']),
                     ],
                    [';', ']', ')', ','],
-                   True),
+                   True, True),
     "Relop": Procedure("Relop",
                        [ProductionRule(['<'], ['<']),
                         ProductionRule(['=='], ['==']),
@@ -228,7 +229,7 @@ PROCEDURES = {
                    [ProductionRule(['NUM', '(', '+', '-'], ['Addop', 'Term', 'D']),
                     ],
                    [';', ']', ')', ',', '<', '=='],
-                   True),
+                   True, True),
     "Addop": Procedure("Addop",
                        [ProductionRule(['+'], ['+']),
                         ProductionRule(['-'], ['-']),
@@ -254,7 +255,7 @@ PROCEDURES = {
                    [ProductionRule(['*'], ['*', 'Signed-factor', 'G']),
                     ],
                    [';', ']', ')', ',', '<', '==', '+', '-'],
-                   True),
+                   True, True),
     "Signed-factor": Procedure("Signed-factor",
                                [ProductionRule(['+'], ['+', 'Factor']),
                                 ProductionRule(['-'], ['-', 'Factor']),
@@ -285,7 +286,7 @@ PROCEDURES = {
                               [ProductionRule(['('], ['(', 'Args', ')']),
                                ],
                               [';', ']', ')', ',', '<', '==', '+', '-', '*'],
-                              True),
+                              True, True),
     "Factor-zegond": Procedure("Factor-zegond",
                                [ProductionRule(['('], ['(', 'Expression', ')']),
                                 ProductionRule(['NUM'], ['NUM']),
@@ -303,12 +304,12 @@ PROCEDURES = {
                             ],
                            ['ID', ';', 'NUM', ']', '(', ')', ',', '{', 'break', 'if', 'while', 'return', 'for', '<',
                             '==', '+', '-', '*'],
-                           True),
+                           True, True),
     "Args": Procedure("Args",
                       [ProductionRule(['ID', 'NUM', '(', '+', '-'], ['Arg-list']),
                        ],
                       [')'],
-                      True),
+                      True, True),
     "Arg-list": Procedure("Arg-list",
                           [ProductionRule(['ID', 'NUM', '(', '+', '-'], ['Expression', 'Arg-list-prime']),
                            ],
@@ -318,6 +319,6 @@ PROCEDURES = {
                                 [ProductionRule([','], [',', 'Expression', 'Arg-list-prime']),
                                  ],
                                 [')'],
-                                True),
+                                True, True),
 
 }

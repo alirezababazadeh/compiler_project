@@ -35,6 +35,11 @@ class TreeGenerator:
             self.current_node.add_child(node)
             self.current_node = node
 
+    def delete_node(self):
+        father = self.current_node.father
+        father.children.pop()
+        self.current_node = father
+
     def level_up(self):
         # if self.current_node.father is None:
         #     raise Exception("root node doesn't have any father")
