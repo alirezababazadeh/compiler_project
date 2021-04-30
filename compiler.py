@@ -15,7 +15,7 @@ class Parser:
     def parse(self):
         self.procedure_repository.run_procedure(self.procedure_repository.start)
         TreeRenderer(self.procedure_repository.tree_generator.tree).write_to_file('parse_tree.txt')
-        self.procedure_repository.error_handler.write_to_file("syntax_errors.txt")
+        self.procedure_repository.error_handler.write_to_file('syntax_errors.txt')
 
 
 class ProcedureRepository:
@@ -27,8 +27,13 @@ class ProcedureRepository:
         self.lookahead = tokenizer.get_next_token()
         self.tree_generator = TreeGenerator()
         self.error_handler = SyntaxErrorHandler()
+        self.EOP = False
 
     def run_procedure(self, procedure_name):
+        if self.lookahead[1] == '$' and self.EOP:
+            return
+        if self.lookahead[1] == ';' and procedure_name == 'Statement-list':
+            print("Error")
         procedure = self.procedures[procedure_name]
         self.tree_generator.add_node(procedure_name)
         has_matched = False
@@ -37,8 +42,12 @@ class ProcedureRepository:
                 has_matched = True
                 for alphabet in production_rule.sentence:
                     if alphabet in self.terminals:
+                        if self.lookahead[1] == '$' and self.EOP:
+                            return
                         self.match(alphabet)
                     else:
+                        if self.lookahead[1] == '$' and self.EOP:
+                            return
                         self.run_procedure(self.procedures[alphabet].name)
             if has_matched:
                 break
@@ -58,18 +67,27 @@ class ProcedureRepository:
                             alphabet = production_rule.sentence[0]
                             if alphabet not in self.terminals and self.procedures[alphabet].has_epsilon_in_first:
                                 for new_alphabet in production_rule.sentence:
+                                    if self.lookahead[1] == '$' and self.EOP:
+                                        return
                                     self.run_procedure(self.procedures[new_alphabet].name)
                                 break
             else:
                 self.tree_generator.delete_node()
                 if self.lookahead[1] in TERMINALS:
-                    self.error_handler.add_syntax_error(f"illegal {self.lookahead[1]}",
-                                                        self.tokenizer.buffer.line_number)
+                    if self.lookahead[1] == '$' and not self.EOP:
+                        self.EOP = True
+                        self.error_handler.add_syntax_error("unexpected EOF", self.tokenizer.buffer.line_number)
+                        return
+                    else:
+                        self.error_handler.add_syntax_error(f"illegal {self.lookahead[1]}",
+                                                            self.tokenizer.buffer.line_number)
                 else:
                     self.error_handler.add_syntax_error(f"illegal {self.lookahead[0]}",
                                                         self.tokenizer.buffer.line_number)
                 # print(f'illegal lookahead on line {self.tokenizer.buffer.line_number}')
                 self.lookahead = self.tokenizer.get_next_token()
+                if self.lookahead[1] == '$' and self.EOP:
+                    return
                 self.run_procedure(procedure.name)
                 return
         self.tree_generator.level_up()
