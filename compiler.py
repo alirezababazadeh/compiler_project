@@ -1,4 +1,5 @@
 from buffer import Buffer
+from code_generator import CodeGenerator
 from scanner import Tokenizer
 from consts import EPSILON, KEYWORDS
 from error_handler import LexicalErrorHandler, SyntaxErrorHandler
@@ -28,8 +29,11 @@ class ProcedureRepository:
         self.tree_generator = TreeGenerator()
         self.error_handler = SyntaxErrorHandler()
         self.EOP = False
+        self.code_generator = CodeGenerator()
 
     def run_procedure(self, procedure_name):
+        if self.lookahead("#", alphabet):
+            self.code_generator.generate_code(alphabet)
         if self.lookahead[1] == '$' and self.EOP:
             return
         if self.lookahead[1] == ';' and procedure_name == 'Statement-list':
