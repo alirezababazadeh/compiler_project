@@ -32,8 +32,6 @@ class ProcedureRepository:
         self.code_generator = CodeGenerator()
 
     def run_procedure(self, procedure_name):
-        if self.lookahead("#", alphabet):
-            self.code_generator.generate_code(alphabet)
         if self.lookahead[1] == '$' and self.EOP:
             return
         if self.lookahead[1] == ';' and procedure_name == 'Statement-list':
