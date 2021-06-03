@@ -1,6 +1,6 @@
 1.	(KEYWORD, void) (ID, min) (SYMBOL, () (KEYWORD, void) (SYMBOL, )) (SYMBOL, {)
 2.	(KEYWORD, for) (KEYWORD, int) (ID, j0) (SYMBOL, ;) (NUM, 2) (SYMBOL, :) (NUM, 90) (SYMBOL, )) (SYMBOL, {)
-3.	(ID, output) (SYMBOL, () (ID, v) (SYMBOL, )) (SYMBOL, ;)
+3.	(ID, finish) (SYMBOL, () (ID, v) (SYMBOL, )) (SYMBOL, ;)
 4.	(SYMBOL, })
 6.	(ID, i)
 7.	(KEYWORD, switch) (SYMBOL, () (ID, arr) (SYMBOL, [) (ID, g) (SYMBOL, ]) (SYMBOL, )) (SYMBOL, {)

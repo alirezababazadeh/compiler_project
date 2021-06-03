@@ -17,8 +17,7 @@ class Parser:
         self.procedure_repository.run_procedure(self.procedure_repository.start)
         TreeRenderer(self.procedure_repository.tree_generator.tree).write_to_file('parse_tree.txt')
         self.procedure_repository.error_handler.write_to_file('syntax_errors.txt')
-        self.procedure_repository.code_generator.write_to_file('code-generator.txt')
-
+        self.procedure_repository.code_generator.write_to_file('output.txt')
 
 
 class ProcedureRepository:
@@ -45,9 +44,9 @@ class ProcedureRepository:
             if self.lookahead[1] in production_rule.first or self.lookahead[0] in production_rule.first:
                 has_matched = True
                 for alphabet in production_rule.sentence:
-                    if str.startswith("#", alphabet):
-                        self.code_generator.generate_code(alphabet[1:], self.lookahead)
-                    if alphabet in self.terminals:
+                    if alphabet.startswith("#"):
+                        self.code_generator.generate_code(alphabet[1:], self.lookahead[1])
+                    elif alphabet in self.terminals:
                         if self.lookahead[1] == '$' and self.EOP:
                             return
                         self.match(alphabet)
@@ -113,7 +112,7 @@ class ProcedureRepository:
             # print(f'missing expected_token on line {self.tokenizer.buffer.line_number}')
 
 
-output_path = ''
+output_path = 'tester\\output.txt'
 input_path = 'input.txt'
 
 

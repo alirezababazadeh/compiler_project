@@ -25,6 +25,6 @@
 28.	(ID, i) (SYMBOL, =) (ID, i) (SYMBOL, +) (NUM, 1) (SYMBOL, ;)
 29.	(SYMBOL, })
 30.	(ID, count) (SYMBOL, =) (NUM, 0) (SYMBOL, ;)
-31.	(ID, output) (SYMBOL, () (ID, f) (SYMBOL, () (NUM, 40) (SYMBOL, ,) (ID, result) (SYMBOL, )) (SYMBOL, )) (SYMBOL, ;)
-32.	(ID, output) (SYMBOL, () (ID, count) (SYMBOL, )) (SYMBOL, ;)
+31.	(ID, finish) (SYMBOL, () (ID, f) (SYMBOL, () (NUM, 40) (SYMBOL, ,) (ID, result) (SYMBOL, )) (SYMBOL, )) (SYMBOL, ;)
+32.	(ID, finish) (SYMBOL, () (ID, count) (SYMBOL, )) (SYMBOL, ;)
 33.	(SYMBOL, })

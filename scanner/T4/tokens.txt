@@ -11,6 +11,6 @@
 12.	(KEYWORD, else) (SYMBOL, {)
 13.	(ID, b) (SYMBOL, =) (NUM, 4) (SYMBOL, ;)
 14.	(SYMBOL, })
-15.	(ID, output) (SYMBOL, () (ID, b) (SYMBOL, ;) (SYMBOL, ))
+15.	(ID, finish) (SYMBOL, () (ID, b) (SYMBOL, ;) (SYMBOL, ))
 16.	(KEYWORD, break) (SYMBOL, ;)
 17.	(SYMBOL, })

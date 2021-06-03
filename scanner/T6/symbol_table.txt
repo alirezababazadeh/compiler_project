@@ -13,4 +13,4 @@
 13.	a
 14.	g
 15.	b
-16.	output
+16.	finish
