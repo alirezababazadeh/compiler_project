@@ -29,7 +29,7 @@ class ProcedureRepository:
         self.tree_generator = TreeGenerator()
         self.error_handler = SyntaxErrorHandler()
         self.EOP = False
-        self.code_generator = CodeGenerator()
+        self.code_generator = CodeGenerator(self.tokenizer.symbol_table)
 
     def run_procedure(self, procedure_name):
         if self.lookahead[1] == '$' and self.EOP:
@@ -43,6 +43,8 @@ class ProcedureRepository:
             if self.lookahead[1] in production_rule.first or self.lookahead[0] in production_rule.first:
                 has_matched = True
                 for alphabet in production_rule.sentence:
+                    if str.startswith("#", alphabet):
+                        self.code_generator.generate_code(alphabet[1:], self.lookahead)
                     if alphabet in self.terminals:
                         if self.lookahead[1] == '$' and self.EOP:
                             return
