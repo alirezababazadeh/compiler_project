@@ -1,0 +1,19 @@
+/*==== T4 ====*/
+int a;
+int b;
+
+void main(void) {
+    int c;
+    int d;
+    a = c = 1;
+    d = b = 3;
+    finish(a);
+    finish(b);
+    c = a * 17 < 15 + 3;
+    finish(c);
+    finish(d < 3);
+    finish(d - 8 < 3);
+    finish(1 * 2);
+
+
+}

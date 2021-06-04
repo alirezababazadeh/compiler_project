@@ -17,7 +17,7 @@ class Parser:
         self.procedure_repository.run_procedure(self.procedure_repository.start)
         TreeRenderer(self.procedure_repository.tree_generator.tree).write_to_file('parse_tree.txt')
         self.procedure_repository.error_handler.write_to_file('syntax_errors.txt')
-        self.procedure_repository.code_generator.write_to_file('PA3_Resources/Tester/output.txt')
+        self.procedure_repository.code_generator.write_to_file('output.txt')
 
 
 class ProcedureRepository:
@@ -112,8 +112,8 @@ class ProcedureRepository:
             # print(f'missing expected_token on line {self.tokenizer.buffer.line_number}')
 
 
-output_path = ''
-input_path = 'PA3_Resources/T5/input.txt'
+output_path = 'tester\\output.txt'
+input_path = 'input.txt'
 
 
 def main():
