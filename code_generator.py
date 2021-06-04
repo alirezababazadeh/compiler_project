@@ -2,7 +2,7 @@ from symbol_table import SymbolTable
 
 
 class CodeGenerator:
-    def __init__(self, symbol_table):
+    def __init__(self, symbol_table: SymbolTable):
         self.symbol_table = symbol_table
         self.semantic_stack = []
         self.program_block = []
