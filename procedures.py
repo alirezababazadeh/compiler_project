@@ -227,7 +227,7 @@ PROCEDURES = {
                                             [';', ']', ')', ',', '<', '=='],
                                             False),
     "D": Procedure("D",
-                   [ProductionRule(['+', '-'], ['#poperator', 'Addop', '#addop', 'Term', 'D']),
+                   [ProductionRule(['+', '-'], ['#poperator', 'Addop', 'Term', '#addop', 'D']),
                     ],
                    [';', ']', ')', ',', '<', '=='],
                    True, True),

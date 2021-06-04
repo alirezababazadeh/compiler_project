@@ -1,12 +1,13 @@
-from symbol_table import SymbolTable
+from symbol_table import SymbolTable, Lexeme
 
 
 class CodeGenerator:
     def __init__(self, symbol_table):
-        self.symbol_table = symbol_table
+        self.symbol_table = {}
+        self.symbol_table_org = symbol_table
         self.semantic_stack = []
         self.program_block = []
-        self.data_pointer = 1000 - 4
+        self.data_pointer = 100
         self.temp_pointer = 500
         self.i = 0
         self.semantic_routines = {'ptype': self.ptype,
@@ -30,7 +31,7 @@ class CodeGenerator:
                                   }
 
     def find_address(self, token_input):
-        return self.symbol_table.get_lexeme(token_input).address
+        return self.symbol_table_org.get_lexeme(token_input).address
 
     def get_temp(self):
         pointer = self.temp_pointer
@@ -45,7 +46,7 @@ class CodeGenerator:
         for i, program in enumerate(self.program_block):
             log += f'{i}\t{program}\n'
         log = log[:-1]
-        with open(f'output/{address}', 'w') as file:
+        with open(f'{address}', 'w') as file:
             file.write(log)
 
     def ptype(self, arg=None):
@@ -62,6 +63,8 @@ class CodeGenerator:
         elif arg != 'output':
             address = self.get_data()
             self.symbol_table[arg] = {'address': address, 'type': self.semantic_stack.pop(), 'length': 0}
+            # .update_lexeme(address, self.semantic_stack.pop())
+            # = {'address': address, 'type': , 'length': 0}
             self.program_block.append(f'(ASSIGN, #0, {address}, )')
             self.i += 1
             self.semantic_stack.append(address)
