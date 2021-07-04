@@ -1,4 +1,5 @@
 from buffer import Buffer
+from code_generator import CodeGenerator
 from scanner import Tokenizer
 from consts import EPSILON, KEYWORDS
 from error_handler import LexicalErrorHandler, SyntaxErrorHandler
@@ -16,6 +17,7 @@ class Parser:
         self.procedure_repository.run_procedure(self.procedure_repository.start)
         TreeRenderer(self.procedure_repository.tree_generator.tree).write_to_file('parse_tree.txt')
         self.procedure_repository.error_handler.write_to_file('syntax_errors.txt')
+        self.procedure_repository.code_generator.write_to_file('PA3_Resources/Tester/output.txt')
 
 
 class ProcedureRepository:
@@ -28,6 +30,7 @@ class ProcedureRepository:
         self.tree_generator = TreeGenerator()
         self.error_handler = SyntaxErrorHandler()
         self.EOP = False
+        self.code_generator = CodeGenerator(self.tokenizer.symbol_table)
 
     def run_procedure(self, procedure_name):
         if self.lookahead[1] == '$' and self.EOP:
@@ -41,7 +44,9 @@ class ProcedureRepository:
             if self.lookahead[1] in production_rule.first or self.lookahead[0] in production_rule.first:
                 has_matched = True
                 for alphabet in production_rule.sentence:
-                    if alphabet in self.terminals:
+                    if alphabet.startswith("#"):
+                        self.code_generator.generate_code(alphabet[1:], self.lookahead[1])
+                    elif alphabet in self.terminals:
                         if self.lookahead[1] == '$' and self.EOP:
                             return
                         self.match(alphabet)
@@ -107,8 +112,8 @@ class ProcedureRepository:
             # print(f'missing expected_token on line {self.tokenizer.buffer.line_number}')
 
 
-output_path = ''
-input_path = 'input.txt'
+output_path = 'tester\\output.txt'
+input_path = 'PA3_Resources/T5/input.txt'
 
 
 def main():

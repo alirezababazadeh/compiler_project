@@ -537,6 +537,5 @@ fabric.properties
 .idea/caches/build_file_checksums.ser
 
 PA1_sample_programs
-input.txt
 /parse_tree.txt
 /syntax_errors.txt

@@ -15,4 +15,4 @@
 15.	whlie
 16.	x
 17.	input
-18.	output
+18.	finish

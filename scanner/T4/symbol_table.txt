@@ -14,4 +14,4 @@
 14.	f
 15.	b
 16.	main
-17.	output
+17.	finish
