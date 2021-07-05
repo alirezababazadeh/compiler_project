@@ -11,13 +11,13 @@ from token_repo import TokenRepository
 
 def main(program_text, output_dir_path):
     buffer = Buffer(program_text)
-    symbol_table = SymbolTable(KEYWORDS)
+    symbol_table = SymbolTable()
     error_handler = LexicalErrorHandler()
     token_repository = TokenRepository()
     tokenizer = Tokenizer(buffer, token_repository, error_handler, symbol_table)
     grammar = Grammar(START, PROCEDURES, TERMINALS)
     procedure_repo = ProcedureRepository(tokenizer, grammar)
-    parser = Parser(procedure_repo, False, True, False)
+    parser = Parser(procedure_repo, generate_parse_tree=False, generate_code=True, generate_syntax_error=False)
     parser.parse(f"{output_dir_path}/parse_tree.txt", f"{output_dir_path}/syntax_errors.txt",
                  f"{output_dir_path}/code_gen.txt")
 
