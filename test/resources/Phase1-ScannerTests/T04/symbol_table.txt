@@ -8,7 +8,7 @@
 8.	default
 9.	case
 10.	return
-11. for
+11.	for
 12.	vod
 13.	min
 14.	voi

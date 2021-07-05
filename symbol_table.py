@@ -2,8 +2,8 @@ class SymbolTable:
     def __init__(self, keywords):
         self.tokens = dict()
         self.data_pointer = 100
-        # for keyword in keywords:
-        #     self.add_lexeme_if_absent(keyword)
+        for keyword in keywords:
+            self.add_lexeme_if_absent(keyword)
 
     def add_lexeme_if_absent(self, token):
         if token in self.tokens.keys():
@@ -19,7 +19,7 @@ class SymbolTable:
         return token_str in self.tokens.keys()
 
     def __str__(self):
-        output = "".join(f"{lexeme.index}.\t{lexeme.name}\n" for token, lexeme in self.tokens)
+        output = "".join(f"{lexeme.index}.\t{lexeme.name}\n" for lexeme in self.tokens.values())
         output = output[:-1]
         return output
 

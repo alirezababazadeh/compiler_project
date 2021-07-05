@@ -1,15 +1,15 @@
+import os
+
 from buffer import Buffer
 from error_handler import LexicalErrorHandler
 from symbol_table import SymbolTable
 from consts import *
 from token_repo import TokenRepository
 
-output_path = 'scanner/'
-input_path = 'PA1_test_programs/'
-
 
 class Tokenizer:
-    def __init__(self, program_buffer, token_repository, error_handler, symbol_table):
+    def __init__(self, program_buffer: Buffer, token_repository: TokenRepository, error_handler: LexicalErrorHandler,
+                 symbol_table: SymbolTable):
         self.buffer = program_buffer
         self.token_repository = token_repository
         self.error_handler = error_handler
@@ -175,7 +175,10 @@ def write_tokens(token_repository, number):
         tokens_file = str(token_repository)
     else:
         tokens_file = "There is no token."
-    open(output_path + f'T{number}/tokens.txt', 'w').write(tokens_file)
+
+    filename = output_dir + f'T{number}/tokens.txt'
+    os.makedirs(os.path.dirname(filename), exist_ok=True)
+    open(filename, 'w').write(tokens_file)
 
 
 def write_lexical_errors(error_handler, number):
@@ -184,11 +187,15 @@ def write_lexical_errors(error_handler, number):
     else:
         lexical_file = "There is no lexical error."
 
-    open(output_path + f'T{number}/lexical_errors.txt', 'w').write(lexical_file)
+    filename = output_dir + f'T{number}/lexical_errors.txt'
+    os.makedirs(os.path.dirname(filename), exist_ok=True)
+    open(filename, 'w').write(lexical_file)
 
 
 def write_symbol_table(symbol_table, number):
-    open(output_path + f'T{number}/symbol_table.txt', 'w').write(str(symbol_table))
+    filename = output_dir + f'T{number}/symbol_table.txt'
+    os.makedirs(os.path.dirname(filename), exist_ok=True)
+    open(filename, 'w').write(str(symbol_table))
 
 
 def main(program_text, number):
@@ -205,15 +212,22 @@ def main(program_text, number):
     write_symbol_table(symbol_table, number)
 
 
+output_dir = 'output/Phase1-Scanner/'
+input_dir = 'test/resources/Phase1-ScannerTests'
+
 # test
 if __name__ == '__main__':
-    i = 0
+    i = 1
     result = []
-    while i < 10:
-        path = input_path + f"T{i}/input.txt"
+    while i < 11:
+        input_test_sub_path = f"{i}"
+        if i < 10:
+            input_test_sub_path = "0" + input_test_sub_path
+        input_test_sub_path = "T" + input_test_sub_path
+        path = f"{input_dir}/{input_test_sub_path}/input.txt"
         input_text = open(path).read()
         main(input_text, i)
-        result.append((i, open(f'PA1_test_programs/T{i}/tokens.txt').read().rstrip() ==
-                       open(f'scanner/T{i}/tokens.txt').read().rstrip()))
+        result.append((i, open(f'{output_dir}/T{i}/tokens.txt').read().rstrip() ==
+                       open(f'{input_dir}/{input_test_sub_path}/tokens.txt').read().rstrip()))
         i += 1
     print(result)

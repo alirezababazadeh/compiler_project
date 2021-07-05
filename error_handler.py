@@ -9,6 +9,9 @@ class LexicalErrorHandler:
             self.errors[str(line_no)] = [lexical_error]
 
     def __str__(self):
+        if len(self.errors) == 0:
+            return "There is no lexical error."
+
         output = ""
         for key, values in self.errors.items():
             values_string = ""

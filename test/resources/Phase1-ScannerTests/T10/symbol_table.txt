@@ -8,7 +8,7 @@
 8.	default
 9.	case
 10.	return
-11. for
+11.	for
 12.	b
 13.	foo
 14.	d
