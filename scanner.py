@@ -198,7 +198,7 @@ def write_symbol_table(symbol_table, number):
     open(filename, 'w').write(str(symbol_table))
 
 
-def main(program_text, number):
+def main(program_text, test_number):
     buffer = Buffer(program_text)
     symbol_table = SymbolTable(KEYWORDS)
     error_handler = LexicalErrorHandler()
@@ -207,9 +207,9 @@ def main(program_text, number):
     while buffer.has_next():
         tokenizer.get_next_token()
 
-    write_tokens(token_repository, number)
-    write_lexical_errors(error_handler, number)
-    write_symbol_table(symbol_table, number)
+    write_tokens(token_repository, test_number)
+    write_lexical_errors(error_handler, test_number)
+    write_symbol_table(symbol_table, test_number)
 
 
 output_dir = 'output/Phase1-Scanner/'

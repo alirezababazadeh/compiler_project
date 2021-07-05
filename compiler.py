@@ -14,11 +14,11 @@ class Parser:
     def __init__(self, procedure_repository):
         self.procedure_repository = procedure_repository
 
-    def parse(self):
+    def parse(self, parse_tree_out_path, syntax_error_out_path, code_gen_out_path):
         self.procedure_repository.run_procedure(self.procedure_repository.start)
-        TreeRenderer(self.procedure_repository.tree_generator.tree).write_to_file('parse_tree.txt')
-        self.procedure_repository.error_handler.write_to_file('syntax_errors.txt')
-        self.procedure_repository.code_generator.write_to_file('PA3_Resources/Tester/output.txt')
+        TreeRenderer(self.procedure_repository.tree_generator.tree).write_to_file(parse_tree_out_path)
+        self.procedure_repository.error_handler.write_to_file(syntax_error_out_path)
+        self.procedure_repository.code_generator.write_to_file(code_gen_out_path)
 
 
 class ProcedureRepository:
@@ -69,7 +69,8 @@ class ProcedureRepository:
                     else:
                         for production_rule in procedure.production_rules:
                             alphabet = production_rule.sentence[0]
-                            if alphabet not in self.grammar.terminals and self.grammar.procedures[alphabet].has_epsilon_in_first:
+                            if alphabet not in self.grammar.terminals and self.grammar.procedures[
+                                alphabet].has_epsilon_in_first:
                                 for new_alphabet in production_rule.sentence:
                                     if self.lookahead[1] == '$' and self.EOP:
                                         return
@@ -111,13 +112,7 @@ class ProcedureRepository:
             # print(f'missing expected_token on line {self.tokenizer.buffer.line_number}')
 
 
-output_path = 'output/Phase2-Parser'
-input_path = 'PA3_Resources/T5/input.txt'
-
-
-def main():
-    program_text = open(input_path).read()
-
+def main(program_text, output_dir_path):
     buffer = Buffer(program_text)
     symbol_table = SymbolTable(KEYWORDS)
     error_handler = LexicalErrorHandler()
@@ -126,8 +121,22 @@ def main():
     grammar = Grammar(START, PROCEDURES, TERMINALS)
     procedure_repo = ProcedureRepository(tokenizer, grammar)
     parser = Parser(procedure_repo)
-    parser.parse()
+    parser.parse(f"{output_dir_path}/parse_tree.txt", f"{output_dir_path}/syntax_errors.txt",
+                 f"{output_dir_path}/code_gen.txt")
 
+
+output_dir = 'output/Phase1-Scanner/'
+input_dir = 'test/resources/Phase2-ParserTests'
 
 if __name__ == '__main__':
-    main()
+    i = 1
+    result = []
+    while i < 11:
+        input_test_sub_path = f"T{i}"
+        path = f"{input_dir}/{input_test_sub_path}/input.txt"
+        input_text = open(path).read()
+        main(input_text, f"{output_dir}/T{i}")
+        result.append((i, open(f'{output_dir}/T{i}/parse_tree.txt').read().rstrip() ==
+                       open(f'{input_dir}/{input_test_sub_path}/parse_tree.txt').read().rstrip()))
+        i += 1
+    print(result)
