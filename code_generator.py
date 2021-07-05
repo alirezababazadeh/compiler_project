@@ -1,3 +1,5 @@
+import os
+
 from symbol_table import SymbolTable
 
 
@@ -129,6 +131,7 @@ class CodeGenerator:
 
     def write_to_file(self, address):
         output = self.get_result()
+        os.makedirs(os.path.dirname(address), exist_ok=True)
         open(f'{address}', 'w').write(output)
 
     def get_result(self):
