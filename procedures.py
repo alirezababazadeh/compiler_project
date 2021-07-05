@@ -101,13 +101,13 @@ PROCEDURES = {
                                False),
     "Statement-list": Procedure("Statement-list",
                                 [ProductionRule(
-                                    ['ID', ',', 'NUM', '(', '{', 'break', 'if', 'while', 'return', 'for', '+', '-'],
+                                    ['ID', ';', 'NUM', '(', '{', 'break', 'if', 'while', 'return', 'for', '+', '-'],
                                     ['Statement', 'Statement-list'])
                                 ],
                                 ['}'],
                                 True, True),
     "Statement": Procedure("Statement",
-                           [ProductionRule(['ID', ',', 'NUM', '(', 'break', '+', '-'], ['Expression-stmt']),
+                           [ProductionRule(['ID', ';', 'NUM', '(', 'break', '+', '-'], ['Expression-stmt']),
                             ProductionRule(['{'], ['Compound-stmt']),
                             ProductionRule(['if'], ['Selection-stmt']),
                             ProductionRule(['while'], ['Iteration-stmt']),
