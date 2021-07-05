@@ -31,7 +31,7 @@ class SyntaxErrorHandler:
         self.errors = []
 
     def add_syntax_error(self, syntax_error, line_no):
-        self.errors.append(f'#{line_no} : syntax error, {syntax_error}')
+        self.errors.append(f'#{line_no} : Syntax Error, {syntax_error}')
 
     def __str__(self):
         output = ""

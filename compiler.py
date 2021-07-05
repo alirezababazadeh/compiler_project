@@ -10,17 +10,6 @@ from token_repo import TokenRepository
 from tree import TreeGenerator, TreeRenderer
 
 
-class Parser:
-    def __init__(self, procedure_repository):
-        self.procedure_repository = procedure_repository
-
-    def parse(self, parse_tree_out_path, syntax_error_out_path, code_gen_out_path):
-        self.procedure_repository.run_procedure(self.procedure_repository.start)
-        TreeRenderer(self.procedure_repository.tree_generator.tree).write_to_file(parse_tree_out_path)
-        self.procedure_repository.error_handler.write_to_file(syntax_error_out_path)
-        self.procedure_repository.code_generator.write_to_file(code_gen_out_path)
-
-
 class ProcedureRepository:
     def __init__(self, tokenizer: Tokenizer, grammar: Grammar):
         self.grammar = grammar
@@ -30,6 +19,7 @@ class ProcedureRepository:
         self.error_handler = SyntaxErrorHandler()
         self.EOP = False
         self.code_generator = CodeGenerator(self.tokenizer.symbol_table)
+        self.generate_code = True
 
     def run_procedure(self, procedure_name):
         if self.lookahead[1] == '$' and self.EOP:
@@ -44,7 +34,10 @@ class ProcedureRepository:
                 has_matched = True
                 for alphabet in production_rule.sentence:
                     if alphabet.startswith("#"):
-                        self.code_generator.generate_code(alphabet[1:], self.lookahead[1])
+                        if self.generate_code:
+                            self.code_generator.generate_code(alphabet[1:], self.lookahead[1])
+                        else:
+                            pass
                     elif alphabet in self.grammar.terminals:
                         if self.lookahead[1] == '$' and self.EOP:
                             return
@@ -59,7 +52,7 @@ class ProcedureRepository:
             if self.lookahead[1] in procedure.follow or self.lookahead[0] in procedure.follow:
                 if not procedure.has_epsilon_in_first:
                     self.tree_generator.delete_node()
-                    self.error_handler.add_syntax_error(f"missing {procedure.name}", self.tokenizer.buffer.line_number)
+                    self.error_handler.add_syntax_error(f"Missing {procedure.name}", self.tokenizer.buffer.line_number)
                     return
                     # print(f'missing {procedure.name} on line {self.tokenizer.buffer.line_number}')
                 else:
@@ -108,8 +101,28 @@ class ProcedureRepository:
             self.tree_generator.level_up()
             self.lookahead = self.tokenizer.get_next_token()
         else:
-            self.error_handler.add_syntax_error(f"missing {expected_token}", self.tokenizer.buffer.line_number)
+            self.error_handler.add_syntax_error(f"Missing {expected_token}", self.tokenizer.buffer.line_number)
             # print(f'missing expected_token on line {self.tokenizer.buffer.line_number}')
+
+
+class Parser:
+    def __init__(self, procedure_repository: ProcedureRepository, generate_parse_tree: bool = True,
+                 generate_code: bool = True,
+                 generate_syntax_error: bool = True):
+        self.procedure_repository = procedure_repository
+        self.generate_parse_tree = generate_parse_tree
+        self.generate_code = generate_code
+        self.generate_syntax_error_file = generate_syntax_error
+        self.procedure_repository.generate_code = generate_code
+
+    def parse(self, parse_tree_out_path, syntax_error_out_path, code_gen_out_path):
+        self.procedure_repository.run_procedure(self.procedure_repository.grammar.start_name)
+        if self.generate_parse_tree:
+            TreeRenderer(self.procedure_repository.tree_generator.tree).write_to_file(parse_tree_out_path)
+        if self.generate_syntax_error_file:
+            self.procedure_repository.error_handler.write_to_file(syntax_error_out_path)
+        if self.generate_code:
+            self.procedure_repository.code_generator.write_to_file(code_gen_out_path)
 
 
 def main(program_text, output_dir_path):
@@ -120,12 +133,12 @@ def main(program_text, output_dir_path):
     tokenizer = Tokenizer(buffer, token_repository, error_handler, symbol_table)
     grammar = Grammar(START, PROCEDURES, TERMINALS)
     procedure_repo = ProcedureRepository(tokenizer, grammar)
-    parser = Parser(procedure_repo)
+    parser = Parser(procedure_repo, True, False, True)
     parser.parse(f"{output_dir_path}/parse_tree.txt", f"{output_dir_path}/syntax_errors.txt",
                  f"{output_dir_path}/code_gen.txt")
 
 
-output_dir = 'output/Phase1-Scanner/'
+output_dir = 'output/Phase2-ParserTests/'
 input_dir = 'test/resources/Phase2-ParserTests'
 
 if __name__ == '__main__':

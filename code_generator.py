@@ -128,8 +128,12 @@ class CodeGenerator:
             self.semantic_stack.append(None)
 
     def write_to_file(self, address):
+        output = self.get_result()
+        open(f'{address}', 'w').write(output)
+
+    def get_result(self):
         output = ''
         for i, program in enumerate(self.program_block):
             output += f'{i}\t{program}\n'
         output = output[:-1]
-        open(f'{address}', 'w').write(output)
+        return output

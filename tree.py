@@ -1,4 +1,6 @@
 # from anytree import Node
+import os
+
 from anytree import Node, RenderTree
 
 
@@ -67,4 +69,8 @@ class TreeRenderer:
             self.recursive_renderer(child, new_node)
 
     def write_to_file(self, path):
-        open(path, 'w', encoding='utf-8').write(self.render())
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        open(path, 'w', encoding='utf-8').write(self.get_tree())
+
+    def get_tree(self):
+        return self.render()
