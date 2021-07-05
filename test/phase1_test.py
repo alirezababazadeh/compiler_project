@@ -9,7 +9,7 @@ from token_repo import TokenRepository
 
 dir_path = os.path.join(os.path.dirname(__file__))
 
-common_input_dir = f'{dir_path}\\resources\\Phase1-ScannerTests'
+common_input_dir = f'{dir_path}/resources/Phase1-ScannerTests'
 
 
 def run_tokenizer(program_text):

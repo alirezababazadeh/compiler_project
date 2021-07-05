@@ -1,12 +1,13 @@
 from buffer import Buffer
 from code_generator import CodeGenerator
-from scanner import Tokenizer
-from consts import EPSILON, KEYWORDS
+from consts import KEYWORDS
 from error_handler import LexicalErrorHandler, SyntaxErrorHandler
-from procedures import PROCEDURES, START, TERMINALS, Procedure, ProductionRule
+from grammar import Grammar
+from procedures import PROCEDURES, START, TERMINALS
+from scanner import Tokenizer
 from symbol_table import SymbolTable
 from token_repo import TokenRepository
-from tree import Tree, InternalNode, TreeGenerator, TreeRenderer
+from tree import TreeGenerator, TreeRenderer
 
 
 class Parser:
@@ -21,11 +22,9 @@ class Parser:
 
 
 class ProcedureRepository:
-    def __init__(self, tokenizer, procedures, start_name, terminals):
-        self.procedures = procedures
-        self.start = start_name
+    def __init__(self, tokenizer: Tokenizer, grammar: Grammar):
+        self.grammar = grammar
         self.tokenizer = tokenizer
-        self.terminals = terminals
         self.lookahead = tokenizer.get_next_token()
         self.tree_generator = TreeGenerator()
         self.error_handler = SyntaxErrorHandler()
@@ -37,7 +36,7 @@ class ProcedureRepository:
             return
         if self.lookahead[1] == ';' and procedure_name == 'Statement-list':
             print("Error")
-        procedure = self.procedures[procedure_name]
+        procedure = self.grammar.procedures[procedure_name]
         self.tree_generator.add_node(procedure_name)
         has_matched = False
         for production_rule in procedure.production_rules:
@@ -46,14 +45,14 @@ class ProcedureRepository:
                 for alphabet in production_rule.sentence:
                     if alphabet.startswith("#"):
                         self.code_generator.generate_code(alphabet[1:], self.lookahead[1])
-                    elif alphabet in self.terminals:
+                    elif alphabet in self.grammar.terminals:
                         if self.lookahead[1] == '$' and self.EOP:
                             return
                         self.match(alphabet)
                     else:
                         if self.lookahead[1] == '$' and self.EOP:
                             return
-                        self.run_procedure(self.procedures[alphabet].name)
+                        self.run_procedure(self.grammar.procedures[alphabet].name)
             if has_matched:
                 break
         if not has_matched:
@@ -70,11 +69,11 @@ class ProcedureRepository:
                     else:
                         for production_rule in procedure.production_rules:
                             alphabet = production_rule.sentence[0]
-                            if alphabet not in self.terminals and self.procedures[alphabet].has_epsilon_in_first:
+                            if alphabet not in self.grammar.terminals and self.grammar.procedures[alphabet].has_epsilon_in_first:
                                 for new_alphabet in production_rule.sentence:
                                     if self.lookahead[1] == '$' and self.EOP:
                                         return
-                                    self.run_procedure(self.procedures[new_alphabet].name)
+                                    self.run_procedure(self.grammar.procedures[new_alphabet].name)
                                 break
             else:
                 self.tree_generator.delete_node()
@@ -112,7 +111,7 @@ class ProcedureRepository:
             # print(f'missing expected_token on line {self.tokenizer.buffer.line_number}')
 
 
-output_path = 'tester\\output.txt'
+output_path = 'output/Phase2-Parser'
 input_path = 'PA3_Resources/T5/input.txt'
 
 
@@ -124,7 +123,8 @@ def main():
     error_handler = LexicalErrorHandler()
     token_repository = TokenRepository()
     tokenizer = Tokenizer(buffer, token_repository, error_handler, symbol_table)
-    procedure_repo = ProcedureRepository(tokenizer, PROCEDURES, START, TERMINALS)
+    grammar = Grammar(START, PROCEDURES, TERMINALS)
+    procedure_repo = ProcedureRepository(tokenizer, grammar)
     parser = Parser(procedure_repo)
     parser.parse()
 
