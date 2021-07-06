@@ -28,7 +28,7 @@ class CodeGenerator:
             if args[0] != 'finish':
                 lexeme = self.symbol_table.get_lexeme(args[0])
                 address = self.get_new_data_address()
-                if lexeme.type is None:
+                if lexeme.data_type is None:
                     lexeme.update_lexeme(address, self.semantic_stack.pop())
                     self.program_block.append(f'(ASSIGN, #0, {address}, )')
                     self.semantic_stack.append(address)
