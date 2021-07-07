@@ -3,6 +3,7 @@ from code_generator import CodeGenerator
 from consts import KEYWORDS
 from error_handler import LexicalErrorHandler, SyntaxErrorHandler
 from grammar import Grammar
+from memory_manager import MemoryManager
 from procedures import PROCEDURES, START, TERMINALS
 from scanner import Tokenizer
 from symbol_table import SymbolTable
@@ -18,7 +19,7 @@ class ProcedureRepository:
         self.tree_generator = TreeGenerator()
         self.error_handler = SyntaxErrorHandler()
         self.EOP = False
-        self.code_generator = CodeGenerator(self.tokenizer.symbol_table)
+        self.code_generator = CodeGenerator(self.tokenizer.symbol_table, MemoryManager())
         self.generate_code = True
 
     def run_procedure(self, procedure_name):
@@ -30,7 +31,8 @@ class ProcedureRepository:
         self.tree_generator.add_node(procedure_name)
         has_matched = False
         for production_rule in procedure.production_rules:
-            if self.lookahead[1] in production_rule.first or self.lookahead[0] in production_rule.first:
+            if self.lookahead[1] in production_rule.first or self.lookahead[
+                0] in production_rule.first or production_rule.first == 'epsilon':
                 has_matched = True
                 for alphabet in production_rule.sentence:
                     if alphabet.startswith("#"):

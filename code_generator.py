@@ -1,24 +1,21 @@
 import os
 
+from memory_manager import MemoryManager
 from symbol_table import SymbolTable
 
 
 class CodeGenerator:
-    def __init__(self, symbol_table: SymbolTable):
+    def __init__(self, symbol_table: SymbolTable, memory_manager: MemoryManager):
+        self.memory_manager = memory_manager
         self.symbol_table = symbol_table
         self.semantic_stack = []
         self.program_block = []
-        self.data_cursor = 1000
-        self.temp_cursor = 500
 
     def get_temp(self):
-        pointer = self.temp_cursor
-        self.temp_cursor += 4
-        return pointer
+        return self.memory_manager.get_temp_address()
 
     def get_new_data_address(self):
-        self.data_cursor += 4
-        return self.data_cursor
+        return self.memory_manager.get_new_data_address()
 
     def generate_code(self, action_symbol, *args):
         if action_symbol == 'ptype':
@@ -26,7 +23,7 @@ class CodeGenerator:
 
         elif action_symbol == 'pid':
             if args[0] != 'finish':
-                lexeme = self.symbol_table.get_lexeme(args[0])
+                lexeme = self.symbol_table.get_lexeme(self.symbol_table.get_current_scope(), args[0])
                 address = self.get_new_data_address()
                 if lexeme.data_type is None:
                     lexeme.update_lexeme(address, self.semantic_stack.pop())
@@ -41,7 +38,7 @@ class CodeGenerator:
         elif action_symbol == 'pnum':
             self.semantic_stack.append('#' + args[0])
 
-        elif action_symbol == 'save_array':
+        elif action_symbol == 'declare_array':
             count = int(self.semantic_stack.pop()[1:])
             self.semantic_stack.pop()
             for i in range(count - 1):
@@ -75,7 +72,7 @@ class CodeGenerator:
             self.program_block.append(f'(ASSIGN, {left}, {right}, )')
             self.semantic_stack.append(right)
 
-        elif action_symbol == 'array_index':
+        elif action_symbol == 'array_usage':
             temp_address = self.get_temp()
             index = self.semantic_stack.pop()
             id = self.semantic_stack.pop()
@@ -97,7 +94,7 @@ class CodeGenerator:
             elif operator == '==':
                 self.program_block.append(f'(EQ, {op1}, {op2}, {temp_address})')
 
-        elif action_symbol == 'addop':
+        elif action_symbol == 'add_or_sub':
             op2 = self.semantic_stack.pop()
             operator = self.semantic_stack.pop()
             op1 = self.semantic_stack.pop()
@@ -109,6 +106,12 @@ class CodeGenerator:
                 self.program_block.append(f'(SUB, {op1}, {op2}, {temp_address})')
             self.semantic_stack.append(temp_address)
 
+            # op = self.semantic_stack.pop()
+            # temp_address = self.get_temp()
+            #
+            # self.program_block.append(f'(SUB, #0, {op}, {temp_address})')
+            # self.semantic_stack.append(temp_address)
+
         elif action_symbol == 'mult':
             op2 = self.semantic_stack.pop()
             op1 = self.semantic_stack.pop()
@@ -117,17 +120,32 @@ class CodeGenerator:
             self.program_block.append(f'(MULT, {op1}, {op2}, {temp_address})')
             self.semantic_stack.append(temp_address)
 
-        elif action_symbol == 'sub':
-            op = self.semantic_stack.pop()
-            temp_address = self.get_temp()
-
-            self.program_block.append(f'(SUB, #0, {op}, {temp_address})')
-            self.semantic_stack.append(temp_address)
-
-        elif action_symbol == 'finish':
+        elif action_symbol == 'EOP':
             address = self.semantic_stack.pop()
             self.program_block.append(f'(PRINT, {address}, , )')
             self.semantic_stack.append(None)
+        elif action_symbol == 'func_start':
+            pass
+        elif action_symbol == 'func_def':
+            pass
+        elif action_symbol == 'declare':
+            pass
+        elif action_symbol == 'iteration_break':
+            pass
+        elif action_symbol == 'push_op':
+            pass
+        elif action_symbol == 'declare_param':
+            pass
+        elif action_symbol == 'start_func_call':
+            pass
+        elif action_symbol == 'end_func_call':
+            pass
+        elif action_symbol == 'return':
+            pass
+
+        else:
+            print(action_symbol)
+            exit()
 
     def write_to_file(self, address):
         output = self.get_result()

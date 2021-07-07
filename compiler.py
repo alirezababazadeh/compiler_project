@@ -23,7 +23,7 @@ def main(program_text, output_dir_path):
 
 
 output_dir = 'output/Phase3-CodeGeneratorTests/'
-input_dir = 'test/resources/Phase3-CodeGeneratorTests'
+input_dir = 'test/resources/Phase4-SemanticAnalyzerTests'
 
 if __name__ == '__main__':
     i = 1
