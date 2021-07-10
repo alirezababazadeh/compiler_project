@@ -6,6 +6,7 @@ from grammar import Grammar
 from memory_manager import MemoryManager
 from procedures import PROCEDURES, START, TERMINALS
 from scanner import Tokenizer
+from semantic_analyzer import SemanticAnalyzer
 from symbol_table import SymbolTable
 from token_repo import TokenRepository
 from tree import TreeRenderer, TreeGenerator
@@ -17,9 +18,12 @@ class ProcedureRepository:
         self.tokenizer = tokenizer
         self.lookahead = tokenizer.get_next_token()
         self.tree_generator = TreeGenerator()
+        self.semantic_analyzer = SemanticAnalyzer(self.tokenizer.symbol_table)
         self.error_handler = SyntaxErrorHandler()
         self.EOP = False
-        self.code_generator = CodeGenerator(self.tokenizer.symbol_table, MemoryManager())
+
+        self.code_generator = CodeGenerator(self.tokenizer.symbol_table, MemoryManager(), tokenizer.buffer,
+                                            self.semantic_analyzer)
         self.generate_code = True
 
     def run_procedure(self, procedure_name):
@@ -119,12 +123,13 @@ class Parser:
 
     def parse(self, parse_tree_out_path, syntax_error_out_path, code_gen_out_path):
         self.procedure_repository.run_procedure(self.procedure_repository.grammar.start_name)
-        if self.generate_parse_tree:
+        if self.generate_parse_tree and parse_tree_out_path is not None:
             TreeRenderer(self.procedure_repository.tree_generator.tree).write_to_file(parse_tree_out_path)
-        if self.generate_syntax_error_file:
+        if self.generate_syntax_error_file and syntax_error_out_path is not None:
             self.procedure_repository.error_handler.write_to_file(syntax_error_out_path)
-        if self.generate_code:
+        if self.generate_code and code_gen_out_path is not None:
             self.procedure_repository.code_generator.write_to_file(code_gen_out_path)
+        self.procedure_repository.semantic_analyzer.write_to_file("semantic-errors.txt")
 
 
 def main(program_text, output_dir_path):

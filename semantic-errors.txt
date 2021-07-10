@@ -1,0 +1,2 @@
+#30 : Semantic Error! Mismatch in numbers of arguments of "printArray".
+#30 : Semantic Error! Mismatch in type of argument 71 of 'int'. Expected 'array' but got 'int' instead.

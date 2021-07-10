@@ -16,7 +16,7 @@ dir_path = os.path.join(os.path.dirname(__file__))
 common_input_dir = f'{dir_path}/resources/Phase2-ParserTests'
 
 
-def run_tokenizer(program_text):
+def run_parser(program_text):
     buffer = Buffer(program_text)
     symbol_table = SymbolTable(KEYWORDS)
     error_handler = LexicalErrorHandler()
@@ -32,7 +32,7 @@ def run_tokenizer(program_text):
 def test_1():
     current_test_dir = f"{common_input_dir}/T1"
     input_txt = open(f"{current_test_dir}/input.txt").read()
-    procedure_repo = run_tokenizer(input_txt)
+    procedure_repo = run_parser(input_txt)
 
     actual_output = TreeRenderer(procedure_repo.tree_generator.tree).get_tree()
     open(f"{dir_path}/temp_tree.txt", "w", encoding="utf-8").write(actual_output)
@@ -45,7 +45,7 @@ def test_1():
 def test_2():
     current_test_dir = f"{common_input_dir}/T2"
     input_txt = open(f"{current_test_dir}/input.txt").read()
-    procedure_repo = run_tokenizer(input_txt)
+    procedure_repo = run_parser(input_txt)
 
     actual_output = TreeRenderer(procedure_repo.tree_generator.tree).get_tree()
     open(f"{dir_path}/temp_tree.txt", "w", encoding="utf-8").write(actual_output)
@@ -58,7 +58,7 @@ def test_2():
 def test_3():
     current_test_dir = f"{common_input_dir}/T3"
     input_txt = open(f"{current_test_dir}/input.txt").read()
-    procedure_repo = run_tokenizer(input_txt)
+    procedure_repo = run_parser(input_txt)
 
     actual_output = TreeRenderer(procedure_repo.tree_generator.tree).get_tree()
     open(f"{dir_path}/temp_tree.txt", "w", encoding="utf-8").write(actual_output)
@@ -71,7 +71,7 @@ def test_3():
 def test_4():
     current_test_dir = f"{common_input_dir}/T4"
     input_txt = open(f"{current_test_dir}/input.txt").read()
-    procedure_repo = run_tokenizer(input_txt)
+    procedure_repo = run_parser(input_txt)
 
     actual_output = TreeRenderer(procedure_repo.tree_generator.tree).get_tree()
     open(f"{dir_path}/temp_tree.txt", "w", encoding="utf-8").write(actual_output)
@@ -84,7 +84,7 @@ def test_4():
 def test_5():
     current_test_dir = f"{common_input_dir}/T5"
     input_txt = open(f"{current_test_dir}/input.txt").read()
-    procedure_repo = run_tokenizer(input_txt)
+    procedure_repo = run_parser(input_txt)
 
     actual_output = TreeRenderer(procedure_repo.tree_generator.tree).get_tree()
     open(f"{dir_path}/temp_tree.txt", "w", encoding="utf-8").write(actual_output)
@@ -97,7 +97,7 @@ def test_5():
 def test_6():
     current_test_dir = f"{common_input_dir}/T6"
     input_txt = open(f"{current_test_dir}/input.txt").read()
-    procedure_repo = run_tokenizer(input_txt)
+    procedure_repo = run_parser(input_txt)
 
     actual_output = TreeRenderer(procedure_repo.tree_generator.tree).get_tree()
     open(f"{dir_path}/temp_tree.txt", "w", encoding="utf-8").write(actual_output)
@@ -110,7 +110,7 @@ def test_6():
 def test_7():
     current_test_dir = f"{common_input_dir}/T7"
     input_txt = open(f"{current_test_dir}/input.txt").read()
-    procedure_repo = run_tokenizer(input_txt)
+    procedure_repo = run_parser(input_txt)
 
     actual_output = TreeRenderer(procedure_repo.tree_generator.tree).get_tree()
     open(f"{dir_path}/temp_tree.txt", "w", encoding="utf-8").write(actual_output)
@@ -123,7 +123,7 @@ def test_7():
 def test_8():
     current_test_dir = f"{common_input_dir}/T8"
     input_txt = open(f"{current_test_dir}/input.txt").read()
-    procedure_repo = run_tokenizer(input_txt)
+    procedure_repo = run_parser(input_txt)
 
     actual_output = TreeRenderer(procedure_repo.tree_generator.tree).get_tree()
     open(f"{dir_path}/temp_tree.txt", "w", encoding="utf-8").write(actual_output)
@@ -136,7 +136,7 @@ def test_8():
 def test_9():
     current_test_dir = f"{common_input_dir}/T9"
     input_txt = open(f"{current_test_dir}/input.txt").read()
-    procedure_repo = run_tokenizer(input_txt)
+    procedure_repo = run_parser(input_txt)
 
     actual_output = TreeRenderer(procedure_repo.tree_generator.tree).get_tree()
     open(f"{dir_path}/temp_tree.txt", "w", encoding="utf-8").write(actual_output)
@@ -149,7 +149,7 @@ def test_9():
 def test_10():
     current_test_dir = f"{common_input_dir}/T10"
     input_txt = open(f"{current_test_dir}/input.txt").read()
-    procedure_repo = run_tokenizer(input_txt)
+    procedure_repo = run_parser(input_txt)
 
     actual_output = TreeRenderer(procedure_repo.tree_generator.tree).get_tree()
     open(f"{dir_path}/temp_tree.txt", "w", encoding="utf-8").write(actual_output)

@@ -22,7 +22,7 @@ def main(program_text, output_dir_path):
                  f"{output_dir_path}/code_gen.txt")
 
 
-output_dir = 'output/Phase3-CodeGeneratorTests/'
+output_dir = 'output/Phase4-SemanticAnalyzerTests/'
 input_dir = 'test/resources/Phase4-SemanticAnalyzerTests'
 
 if __name__ == '__main__':
